@@ -10,7 +10,7 @@ However, it is far from perfect. Sometimes WBM archives miss time periods, or si
 
 history4feed supports the ability to add posts in a feed manually to help solve this problem. However, this still requires you to get a list of missing posts.
 
-sitemap2posts is designed to identify all posts for a blog, using a specified URL path, along with titles and published dates, ready to be added to history4feed manually for processing and inclusion in a feed.
+sitemap2posts is designed to identify all posts for a blog, using a specified URL path. It will then get all titles and published dates (using sitemap `lastmod` dates), and outputted in a json document the matches the required body format for each entry to be added to history4feed manually.
 
 ## Install
 
@@ -28,8 +28,21 @@ pip3 install -r requirements.txt
 ## Run
 
 ```shell
-python sitemap2posts.py https://www.crowdstrike.com/blog/ --output custom_output.csv
+python sitemap2posts.py https://www.crowdstrike.com/blog/ \
+	--lastmod_min 2024-01-01 \
+	--output crowdstrike_blog.json
 ```
+
+Where:
+
+* `lastmod_min`: specify the minimum date for `lastmod` time found in sitemap. The input is expected in the format `YYYY-MM-DD`.
+* `output`: the output file name, should end in `.json`
+
+## Examples
+
+We keep a history of all URLs for blogs we track in our [Awesome Threat Intel Blog list](https://github.com/muchdogesec/awesome_threat_intel_blogs) on Cloudflare.
+
+See the `examples` directory for where to find the output JSON files.
 
 ## How it works 
 
@@ -124,16 +137,41 @@ If a sitemap index is returned the scripts crawls all `<loc>` urls to get the si
 
 Once all sitemap files have been identified from the robots.txt file, all `url.loc` and `url.lastmod` values are collected and stored.
 
-The script then removes any duplicate URL entries, keeping the entry with the lowest `url.lastmod` time.
+The script then removes any duplicate URL entries, keeping the entry with the lowest `url.lastmod` time in such scenarios.
+
+The list is further refined base on the `lastmod_min` time specified by the user in the command line. Here the script will remove all urls with a `lastmod` time less than that specified.
 
 ### Step 5: get post title
 
-Finally the script should visit each URL to get the title of the post.
+Finally the script should visit each URL to get the title of the post. This is a somewhat crude approach as it will grab the HTML `title`, which might not actually be exactly the same as the blog title.
 
 ### Step 6: print final file
 
-At the last step a csv file with `url`, `lastmod`, `title`, and `sitemap` (sitemaps url was found in) should be created.
+At the last step a JSON file with `url`, `lastmod`, `title`, and `sitemap` (sitemaps url was originally found in) should be created as follows;
 
+```json
+    {
+        "url": "",
+        "lastmod": "",
+        "title": "",
+        "sitemap": ""
+    }
+```
+
+#### A note on errors
+
+In some cases sitemaps contain links that do not exist anymore (hit 404s). Occassionally the server might be down (500) or you're blocked from a page (i.e. to many requests).
+
+In these cases, the `title` will be marked as `Failed to Retrieve`. e.g.
+
+```json
+    {
+        "url": "https://www.crowdstrike.com/blog/author/vicky-ngo-lam-josh-grunzweig/",
+        "lastmod": "2024-07-10T01:06:58+00:00",
+        "title": "Failed to Retrieve",
+        "sitemap": "https://www.crowdstrike.com/author-sitemap.xml"
+    },
+```
 ## Support
 
 [Minimal support provided via the DOGESEC community](https://community.dogesec.com/).
@@ -141,4 +179,3 @@ At the last step a csv file with `url`, `lastmod`, `title`, and `sitemap` (sitem
 ## License
 
 [Apache 2.0](/LICENSE).
-
