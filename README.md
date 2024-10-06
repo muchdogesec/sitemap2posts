@@ -73,7 +73,7 @@ Sitemap: https://www.crowdstrike.com/falcon-sitemap.xml
 
 The script then opens each sitemap file listed in robots.txt
 
-This can point to a sitemap that looks like this
+This can point to a sitemap directl (e.g. `https://0xtoxin.github.io/robots.txt`)
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>

@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import json
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 import re
 import argparse
 import logging
@@ -10,6 +10,22 @@ from datetime import datetime, timezone
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
+# Disallowed domains
+disallow_domains = [
+    'medium.com',
+    'wordpress.com',
+    'reddit.com',
+]
+
+def is_disallowed_domain(blog_url):
+    """Check if the blog URL belongs to a disallowed domain."""
+    domain = urlparse(blog_url).netloc
+    for disallowed_domain in disallow_domains:
+        if disallowed_domain in domain:
+            logging.warning(f"Domain '{domain}' is in the disallow list. Skipping blog.")
+            return True
+    return False
+
 def get_sitemaps_from_robots(url):
     logging.info(f"Fetching robots.txt from {url}")
     robots_url = urljoin(url, '/robots.txt')
@@ -17,7 +33,10 @@ def get_sitemaps_from_robots(url):
     if response.status_code == 200:
         logging.info("Successfully fetched robots.txt")
         sitemaps = re.findall(r'Sitemap: (.*)', response.text)
-        logging.info(f"Found {len(sitemaps)} sitemaps in robots.txt")
+        if not sitemaps:
+            logging.error("No sitemaps found in robots.txt.")
+        else:
+            logging.info(f"Found {len(sitemaps)} sitemaps in robots.txt")
         return sitemaps
     else:
         logging.error(f"Failed to fetch robots.txt from {robots_url}, status code: {response.status_code}")
@@ -82,6 +101,11 @@ def parse_lastmod(lastmod_str):
     Tries to parse the lastmod date string. Handles different formats.
     Logs the detected format when successful.
     """
+    if lastmod_str is None:
+        logging.warning(f"Lastmod is None, assigning a default date.")
+        # Assigning the earliest possible date, converted to an offset-aware datetime in UTC
+        return datetime.min.replace(tzinfo=timezone.utc)
+
     formats = [
         '%Y-%m-%dT%H:%M:%S%z',  # Full ISO 8601 format with timezone
         '%Y-%m-%dT%H:%M:%S',    # ISO 8601 without timezone
@@ -92,6 +116,9 @@ def parse_lastmod(lastmod_str):
         try:
             parsed_date = datetime.strptime(lastmod_str, fmt)
             logging.info(f"Parsed '{lastmod_str}' using format '{fmt}'")
+            # Make sure all dates are offset-aware (UTC) if they aren't already
+            if parsed_date.tzinfo is None:
+                parsed_date = parsed_date.replace(tzinfo=timezone.utc)
             return parsed_date
         except ValueError:
             continue
@@ -111,8 +138,19 @@ def compare_dates(lastmod_parsed, lastmod_min):
     return lastmod_parsed >= lastmod_min
 
 def sitemap2posts(blog_url, output_filename, lastmod_min):
+    # Check if the domain is disallowed
+    if is_disallowed_domain(blog_url):
+        logging.error(f"Processing aborted. Domain '{urlparse(blog_url).netloc}' is disallowed.")
+        return
+    
     logging.info(f"Starting sitemap crawl for {blog_url}")
     sitemaps = get_sitemaps_from_robots(blog_url)
+    
+    # If no sitemaps are found, stop processing
+    if not sitemaps:
+        logging.error("Sorry, no sitemaps are defined in this website's robots.txt file, so it cannot be crawled.")
+        return
+    
     all_urls = []
     
     for sitemap in sitemaps:
@@ -156,9 +194,12 @@ def sitemap2posts(blog_url, output_filename, lastmod_min):
             title = get_post_title(url)
             sitemap = next(sitemap for sitemap_url, _, sitemap in all_urls if sitemap_url == url)
             posts.append({'url': url, 'lastmod': lastmod, 'title': title, 'sitemap': sitemap})
-    
+
+    # Sort posts by sitemap first, and then by lastmod (newest first)
+    sorted_posts = sorted(posts, key=lambda x: (x['sitemap'], parse_lastmod(x['lastmod'])), reverse=True)
+
     # Save to JSON
-    save_to_json(posts, output_filename)
+    save_to_json(sorted_posts, output_filename)
     logging.info("Sitemap crawling completed successfully")
 
 if __name__ == "__main__":
