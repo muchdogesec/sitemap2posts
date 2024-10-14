@@ -28,14 +28,20 @@ pip3 install -r requirements.txt
 ## Run
 
 ```shell
-python sitemap2posts.py https://www.crowdstrike.com/blog/ \
+python3 sitemap2posts.py https://www.crowdstrike.com/blog/ \
 	--lastmod_min 2024-01-01 \
+    --ignore_sitemaps https://www.crowdstrike.com/page-sitemap.xml,https://www.crowdstrike.com/epp101-sitemap.xml,https://www.crowdstrike.com/author-sitemap.xml \
+    --ignore_domain_paths https://www.crowdstrike.com/blog/author,https://www.crowdstrike.com/blog/videos/ \
+    --remove_404_records \
 	--output crowdstrike_blog.json
 ```
 
 Where:
 
 * `lastmod_min`: specify the minimum date for `lastmod` time found in sitemap. The input is expected in the format `YYYY-MM-DD`.
+* `ignore_sitemaps`: if you know a specific sitemap file you don't want to crawl, you can pass it here. Useful to reduce the number of request being made
+* `ignore_domain_paths`: will accept a comma-separated list of domains you want to filter out of the final output. Useful if there are nested pages in the blog you don't care about
+* `remove_404_records`: often sitemaps contain links to urls that resolve to 404s. To remove these records from the final sitemap, pass this flag
 * `output`: the output file name, should end in `.json`
 
 ## Examples
@@ -172,6 +178,9 @@ In these cases, the `title` will be marked as `Failed to Retrieve`. e.g.
         "sitemap": "https://www.crowdstrike.com/author-sitemap.xml"
     },
 ```
+
+This is one reason to use the `remove_404_records` flag at script run-time.
+
 ## Support
 
 [Minimal support provided via the DOGESEC community](https://community.dogesec.com/).
