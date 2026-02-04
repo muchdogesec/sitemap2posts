@@ -294,18 +294,21 @@ def process_feed(
         }
     
     # Determine mode based on presence of sitemap_urls
+    logging.info(f"Processing feed: {feed_id}")
     if sitemap_urls:
-        mode = 'sitemap_urls'
-        logging.info(f"Processing feed: {feed_id}")
         logging.info(f"Mode: sitemap_urls, Blog URL: {blog_url}, Sitemap URLs: {len(sitemap_urls)}")
     else:
-        mode = 'robots'
-        logging.info(f"Processing feed: {feed_id}")
         logging.info(f"Mode: robots, Blog URL: {blog_url}")
     
     # Parse lastmod_min if provided
     lastmod_min_date = None
-    if lastmod_min:
+    if pubdate := feed_details.get('latest_item_pubdate'):
+        try:
+            lastmod_min_date = datetime.fromisoformat(pubdate)
+            logging.info(f"Using feed's latest_item_pubdate for filtering: {pubdate}")
+        except ValueError:
+            logging.error(f"Invalid latest_item_pubdate format from feed: {pubdate}")
+    elif lastmod_min:
         try:
             lastmod_min_date = datetime.strptime(lastmod_min, "%Y-%m-%d").replace(
                 tzinfo=timezone.utc
@@ -313,12 +316,6 @@ def process_feed(
             logging.info(f"Filtering posts from {lastmod_min}")
         except ValueError:
             logging.error(f"Invalid lastmod_min format: {lastmod_min}")
-    elif pubdate := feed_details.get('latest_item_pubdate'):
-        try:
-            lastmod_min_date = datetime.fromisoformat(pubdate)
-            logging.info(f"Using feed's latest_item_pubdate for filtering: {pubdate}")
-        except ValueError:
-            logging.error(f"Invalid latest_item_pubdate format from feed: {pubdate}")
     
     # Fetch posts from sitemap
     posts = sitemap2posts(
