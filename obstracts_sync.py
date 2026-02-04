@@ -135,7 +135,8 @@ class ObstractsAPIClient:
         try:
             response = self.session.get(endpoint)
             if response.ok:
-                return response.json()
+                data = response.json()
+                return data.get('obstract_feed_metadata', data)
             else:
                 logging.error(
                     f"Failed to retrieve feed {feed_id}: "
@@ -259,6 +260,17 @@ def process_feed(
     mode = feed_config.get('mode', 'robots')
     profile_id = feed_config.get('profile_id')
     lastmod_min = feed_config.get('lastmod_min')
+    feed_details = api_client.get_feed_details(feed_id)  # Ensure feed exists
+    if not feed_details:
+        logging.error(f"Feed {feed_id}: Could not retrieve feed details from API")
+        return {
+            'feed_id': feed_id,
+            'posts_count': 0,
+            'job_id': None,
+            'success': False,
+            'error': 'Failed to retrieve feed details from API'
+        }
+
     
     # Validate profile_id exists
     if not profile_id:
@@ -270,7 +282,7 @@ def process_feed(
             'success': False,
             'error': 'Missing required field: profile_id'
         }
-    
+        
     logging.info(f"Processing feed: {feed_id}")
     logging.info(f"Mode: {mode}, Sitemap URLs: {len(sitemap_urls)}")
     
@@ -284,6 +296,12 @@ def process_feed(
             logging.info(f"Filtering posts from {lastmod_min}")
         except ValueError:
             logging.error(f"Invalid lastmod_min format: {lastmod_min}")
+    elif pubdate := feed_details.get('latest_item_pubdate'):
+        try:
+            lastmod_min_date = datetime.fromisoformat(pubdate)
+            logging.info(f"Using feed's latest_item_pubdate for filtering: {pubdate}")
+        except ValueError:
+            logging.error(f"Invalid latest_item_pubdate format from feed: {pubdate}")
     
     # Prepare URLs for sitemap2posts
     if mode == 'sitemap_urls':

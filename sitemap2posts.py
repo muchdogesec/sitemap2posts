@@ -98,11 +98,11 @@ def dedupe_urls(url_list):
 
 def get_post_title(url, check_404=False):
     """Fetch the title of a post from its URL.
-    
+
     Args:
         url: The URL to fetch
         check_404: If True, return None for 404 responses instead of fetching title
-    
+
     Returns:
         Tuple of (title, is_valid) where is_valid indicates if URL is not 404
     """
@@ -112,12 +112,12 @@ def get_post_title(url, check_404=False):
     if not response:
         logging.debug(f"Failed to fetch URL {url}")
         return "Failed to Retrieve", False
-    
+
     # Check for 404 if requested
     if check_404 and response.status_code == 404:
         logging.info(f"URL {url} returned 404. Excluding from results.")
         return None, False
-    
+
     if response.status_code != 200:
         logging.debug(f"Failed to fetch URL {url}")
         return "Failed to Retrieve", False
@@ -235,7 +235,7 @@ def filter_urls_by_base(urls, base_url):
 def url_matches_pattern(url, pattern):
     """Check if URL matches a pattern (supports both prefix and glob patterns)."""
     # If pattern contains glob characters, use fnmatch
-    if '*' in pattern or '?' in pattern or '[' in pattern:
+    if "*" in pattern or "?" in pattern or "[" in pattern:
         return fnmatch(url, pattern)
     # Otherwise, use simple prefix matching
     return url.startswith(pattern)
@@ -244,7 +244,7 @@ def url_matches_pattern(url, pattern):
 def filter_urls_by_paths(urls, ignore_paths=None, allow_paths=None):
     """Filter URLs based on ignore and allow path lists (supports glob patterns)."""
     filtered = urls
-    
+
     # Apply allow list first (if specified, only keep URLs that match)
     if allow_paths:
         logging.info("Applying --path_allow_list filter (supports glob patterns)")
@@ -256,7 +256,7 @@ def filter_urls_by_paths(urls, ignore_paths=None, allow_paths=None):
         logging.info(
             f"{len(filtered)} URL(s) remain after applying --path_allow_list filter"
         )
-    
+
     # Apply ignore list (remove URLs that match)
     if ignore_paths:
         logging.info("Applying --path_ignore_list filter (supports glob patterns)")
@@ -268,22 +268,22 @@ def filter_urls_by_paths(urls, ignore_paths=None, allow_paths=None):
         logging.info(
             f"{len(filtered)} URL(s) remain after applying --path_ignore_list filter"
         )
-    
+
     return filtered
 
 
 def fetch_post_titles(urls, remove_404_records=False):
     """Fetch titles for all URLs in parallel.
-    
+
     Args:
         urls: Dictionary of URLs with their metadata
         remove_404_records: If True, exclude URLs that return 404
-    
+
     Returns:
         List of post dictionaries
     """
     posts = []
-    
+
     if remove_404_records:
         logging.info("Fetching post titles (excluding 404 responses)...")
     else:
@@ -291,22 +291,22 @@ def fetch_post_titles(urls, remove_404_records=False):
 
     with ThreadPoolExecutor(max_workers=10) as executor:
         future_to_url = {
-            executor.submit(get_post_title, url, remove_404_records): url 
+            executor.submit(get_post_title, url, remove_404_records): url
             for url in urls
         }
         for future in as_completed(future_to_url):
             url = future_to_url[future]
             try:
                 title, is_valid = future.result()
-                
+
                 # Skip if 404 and we're filtering them out
                 if remove_404_records and not is_valid:
                     continue
-                
+
                 # Skip if title is None (404 case)
                 if title is None:
                     continue
-                
+
                 posts.append(
                     {
                         "url": url,
@@ -317,7 +317,7 @@ def fetch_post_titles(urls, remove_404_records=False):
                 )
             except Exception as e:
                 logging.error(f"Error fetching title for URL {url}: {e}")
-    
+
     if remove_404_records:
         logging.info(
             f"{len(posts)} valid post(s) after fetching titles and excluding 404s"
@@ -373,7 +373,9 @@ def sitemap2posts(
     # Apply filters
     filtered_urls = filter_urls_by_base(deduped_urls, blog_url)
     filtered_urls = filter_urls_by_lastmod(filtered_urls, lastmod_min)
-    filtered_urls = filter_urls_by_paths(filtered_urls, path_ignore_list, path_allow_list)
+    filtered_urls = filter_urls_by_paths(
+        filtered_urls, path_ignore_list, path_allow_list
+    )
 
     if not filtered_urls:
         logging.warning("No URLs to process after applying filters.")
