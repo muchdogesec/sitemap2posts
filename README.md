@@ -85,9 +85,7 @@ python sitemap2posts.py https://www.crowdstrike.com/blog/ \
 
 ```shell
 python sitemap2posts.py https://www.crowdstrike.com/blog/ \
-	https://www.crowdstrike.com/post-sitemap.xml \
-	https://www.crowdstrike.com/post-sitemap2.xml \
-	--mode sitemap_urls \
+	--sitemap_urls https://www.crowdstrike.com/post-sitemap.xml https://www.crowdstrike.com/post-sitemap2.xml \
 	--output crowdstrike_blog.json
 ```
 
@@ -104,10 +102,8 @@ python sitemap2posts.py https://www.crowdstrike.com/blog/ \
 
 ## Command-Line Options
 
-* **`urls`** (positional): 
-  - In `robots` mode: Single blog URL
-  - In `sitemap_urls` mode: Blog URL followed by one or more sitemap URLs
-* **`--mode`**: Operation mode - `robots` (default) or `sitemap_urls`
+* **`blog_url`** (positional): Blog URL to extract posts from
+* **`--sitemap_urls`**: One or more sitemap URLs to crawl directly (automatically uses sitemap_urls mode instead of robots mode)
 * **`--output`**: Output JSON file name (default: `sitemap_posts.json`)
 * **`--lastmod_min`**: Filter URLs with lastmod date on or after this date (format: `YYYY-MM-DD`)
 * **`--path_ignore_list`**: Path patterns to ignore. Supports glob patterns (`*`, `?`, `[...]`). Examples: `/blog/author`, `*/tag/*`, `https://example.com/*/archive`

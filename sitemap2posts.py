@@ -329,43 +329,27 @@ def fetch_post_titles(urls, remove_404_records=False):
 
 
 def sitemap2posts(
-    urls,
-    lastmod_min,
+    blog_url,
+    sitemap_urls=None,
+    lastmod_min=None,
     path_ignore_list=None,
     path_allow_list=None,
     ignore_sitemaps=None,
     remove_404_records=False,
-    mode="robots",
 ):
     """Main function to crawl sitemaps and extract post information."""
-
-    # Get sitemaps based on mode
-    if mode == "sitemap_urls":
-        if len(urls) < 2:
-            logging.error(
-                "sitemap_urls mode requires: blog_url followed by one or more sitemap URLs."
-            )
-            return []
-        blog_url = urls[0]
-        sitemaps = urls[1:]
-        logging.info(f"Starting sitemap crawl for {blog_url}")
-        logging.info(f"Using {len(sitemaps)} provided sitemap URL(s)")
-    else:
-        # Default: get sitemaps from robots.txt
-        if len(urls) != 1:
-            logging.error("robots mode requires exactly one blog URL.")
-            return []
-        blog_url = urls[0]
-        logging.info(f"Starting sitemap crawl for {blog_url}")
-        sitemaps = get_sitemaps_from_robots(blog_url)
-        if not sitemaps:
-            logging.error(
-                "No sitemaps are defined in this website's robots.txt file, so it cannot be crawled."
-            )
-            return []
+    
+    if not sitemap_urls:
+        logging.info("Using sitemaps from robots.txt")
+        sitemap_urls = get_sitemaps_from_robots(blog_url)
+    if not sitemap_urls:
+        logging.error(
+            "No sitemaps are defined in this website's robots.txt file, so it cannot be crawled."
+        )
+        return []
 
     # Collect URLs from all sitemaps
-    all_urls = collect_urls_from_sitemaps(sitemaps, ignore_sitemaps)
+    all_urls = collect_urls_from_sitemaps(sitemap_urls, ignore_sitemaps)
 
     # Deduplicate URLs
     deduped_urls = dedupe_urls(all_urls)
@@ -395,15 +379,14 @@ def parse_cli_arguments():
         description="Retrieve blog posts from sitemap.",
         epilog="""Examples:
   robots mode:      python sitemap2posts.py https://example.com/blog/
-  sitemap_urls mode: python sitemap2posts.py https://example.com/blog/ https://example.com/sitemap1.xml https://example.com/sitemap2.xml --mode sitemap_urls
+  sitemap_urls mode: python sitemap2posts.py https://example.com/blog/ --sitemap_urls https://example.com/sitemap1.xml https://example.com/sitemap2.xml
         """,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument(
-        "urls",
+        "blog_url",
         type=str,
-        nargs="+",
-        help="In 'robots' mode: single blog URL. In 'sitemap_urls' mode: blog URL followed by one or more sitemap URLs",
+        help="Blog URL to extract posts from",
     )
     parser.add_argument(
         "--output",
@@ -412,11 +395,10 @@ def parse_cli_arguments():
         help="Output JSON file name (default: sitemap_posts.json)",
     )
     parser.add_argument(
-        "--mode",
+        "--sitemap_urls",
         type=str,
-        choices=["robots", "sitemap_urls"],
-        default="robots",
-        help="Mode: 'robots' to fetch from robots.txt (default), 'sitemap_urls' to use provided sitemap URLs",
+        nargs="+",
+        help="One or more sitemap URLs to crawl directly (automatically uses sitemap_urls mode)",
     )
     parser.add_argument(
         "--lastmod_min",
@@ -477,13 +459,13 @@ if __name__ == "__main__":
 
     # Call the function with the URLs and other parameters from CLI input
     posts = sitemap2posts(
-        urls=args.urls,
+        args.blog_url,
+        sitemap_urls=args.sitemap_urls,
         lastmod_min=lastmod_min,
         path_ignore_list=path_ignore_list,
         path_allow_list=path_allow_list,
         ignore_sitemaps=ignore_sitemaps,
         remove_404_records=args.remove_404_records,
-        mode=args.mode,
     )
 
     save_to_json(posts, args.output)

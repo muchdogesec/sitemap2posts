@@ -30,20 +30,16 @@ Create a JSON configuration file (e.g., `obstracts_config.json`) with your feed 
     "feeds": [
         {
             "feed_id": "example-feed-id-1",
-            "sitemap_urls": [
-                "https://www.crowdstrike.com/blog/"
-            ],
-            "mode": "robots",
+            "blog_url": "https://www.crowdstrike.com/blog/",
             "profile_id": "profile-uuid-here",
             "lastmod_min": "2024-01-01"
         },
         {
             "feed_id": "example-feed-id-2",
+            "blog_url": "https://krebsonsecurity.com/",
             "sitemap_urls": [
-                "https://krebsonsecurity.com/",
                 "https://krebsonsecurity.com/post-sitemap.xml"
             ],
-            "mode": "sitemap_urls",
             "profile_id": "profile-uuid-here",
             "lastmod_min": "2024-01-01",
             "path_ignore_list": [
@@ -66,11 +62,11 @@ Create a JSON configuration file (e.g., `obstracts_config.json`) with your feed 
 Each feed in the configuration supports the following options:
 
 - **feed_id** (required): The Obstracts feed ID to post to
-- **sitemap_urls** (required): Array of URLs
-  - For `robots` mode: Single blog URL (e.g., `["https://example.com/blog/"]`)
-  - For `sitemap_urls` mode: Blog URL followed by sitemap URLs (e.g., `["https://example.com/blog/", "https://example.com/sitemap.xml"]`)
-- **mode** (optional, default: `"robots"`): Either `"robots"` or `"sitemap_urls"`
-- **profile_id** (optional): Profile UUID to associate with posts
+- **blog_url** (required): Blog URL to extract posts from
+- **sitemap_urls** (optional): Array of sitemap URLs to crawl directly
+  - If provided, automatically uses sitemap_urls mode
+  - If omitted, uses robots mode (discovers sitemaps from robots.txt)
+- **profile_id** (required): Profile UUID to associate with posts
 - **lastmod_min** (optional): Filter posts with lastmod on or after this date (YYYY-MM-DD format)
   - Should be retrieved from the Obstracts API server unless manually set
   - This value is removed from the config file after each run

@@ -190,11 +190,11 @@ def validate_config(config: Dict) -> bool:
         
         # Check for required fields
         if not feed.get('feed_id'):
-            logging.error(f"Feed at index {idx}: Missing required field 'feed_id'")
+            logging.error(f"Feed {idx}: Missing required field 'feed_id'")
             return False
         
-        if not feed.get('sitemap_urls'):
-            logging.error(f"Feed {feed_id}: Missing required field 'sitemap_urls'")
+        if not feed.get('blog_url'):
+            logging.error(f"Feed {feed_id}: Missing required field 'blog_url'")
             return False
         
         if not feed.get('profile_id'):
@@ -256,10 +256,11 @@ def process_feed(
         Statistics dictionary with job info
     """
     feed_id = feed_config.get('feed_id')
+    blog_url = feed_config.get('blog_url')
     sitemap_urls = feed_config.get('sitemap_urls', [])
-    mode = feed_config.get('mode', 'robots')
     profile_id = feed_config.get('profile_id')
     lastmod_min = feed_config.get('lastmod_min')
+    
     feed_details = api_client.get_feed_details(feed_id)  # Ensure feed exists
     if not feed_details:
         logging.error(f"Feed {feed_id}: Could not retrieve feed details from API")
@@ -271,8 +272,17 @@ def process_feed(
             'error': 'Failed to retrieve feed details from API'
         }
 
+    # Validate required fields
+    if not blog_url:
+        logging.error(f"Feed {feed_id}: Missing required field 'blog_url'")
+        return {
+            'feed_id': feed_id,
+            'posts_count': 0,
+            'job_id': None,
+            'success': False,
+            'error': 'Missing required field: blog_url'
+        }
     
-    # Validate profile_id exists
     if not profile_id:
         logging.error(f"Feed {feed_id}: Missing required field 'profile_id'")
         return {
@@ -282,9 +292,16 @@ def process_feed(
             'success': False,
             'error': 'Missing required field: profile_id'
         }
-        
-    logging.info(f"Processing feed: {feed_id}")
-    logging.info(f"Mode: {mode}, Sitemap URLs: {len(sitemap_urls)}")
+    
+    # Determine mode based on presence of sitemap_urls
+    if sitemap_urls:
+        mode = 'sitemap_urls'
+        logging.info(f"Processing feed: {feed_id}")
+        logging.info(f"Mode: sitemap_urls, Blog URL: {blog_url}, Sitemap URLs: {len(sitemap_urls)}")
+    else:
+        mode = 'robots'
+        logging.info(f"Processing feed: {feed_id}")
+        logging.info(f"Mode: robots, Blog URL: {blog_url}")
     
     # Parse lastmod_min if provided
     lastmod_min_date = None
@@ -303,41 +320,15 @@ def process_feed(
         except ValueError:
             logging.error(f"Invalid latest_item_pubdate format from feed: {pubdate}")
     
-    # Prepare URLs for sitemap2posts
-    if mode == 'sitemap_urls':
-        if not sitemap_urls:
-            logging.error(f"Feed {feed_id}: sitemap_urls mode requires sitemap URLs")
-            return {
-                'feed_id': feed_id,
-                'posts_count': 0,
-                'job_id': None,
-                'success': False,
-                'error': 'No sitemap URLs provided'
-            }
-        # First URL should be the blog URL, rest are sitemap URLs
-        urls = sitemap_urls
-    else:
-        # robots mode: only need the blog URL (first in sitemap_urls)
-        if not sitemap_urls or len(sitemap_urls) == 0:
-            logging.error(f"Feed {feed_id}: No blog URL provided")
-            return {
-                'feed_id': feed_id,
-                'posts_count': 0,
-                'job_id': None,
-                'success': False,
-                'error': 'No blog URL provided'
-            }
-        urls = [sitemap_urls[0]]
-    
     # Fetch posts from sitemap
     posts = sitemap2posts(
-        urls=urls,
+        blog_url,
+        sitemap_urls=sitemap_urls,
         lastmod_min=lastmod_min_date,
         path_ignore_list=feed_config.get('path_ignore_list'),
         path_allow_list=feed_config.get('path_allow_list'),
         ignore_sitemaps=feed_config.get('ignore_sitemaps'),
         remove_404_records=feed_config.get('remove_404_records', False),
-        mode=mode
     )
     
     if not posts:

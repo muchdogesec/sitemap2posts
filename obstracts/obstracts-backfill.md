@@ -53,7 +53,7 @@ python3 sitemap2posts.py https://www.volexity.com/blog/ \
 ```shell
 python3 sitemap2posts.py https://www.esentire.com/blog/ \
     --lastmod_min 2020-01-01 \
-    --sitemap_urls https://www.esentire.com/sitemaps-1-section-blog-1-sitemap-p1.xml,https://www.esentire.com/sitemaps-1-section-blog-1-sitemap-p2.xml \
+    --sitemap_urls https://www.esentire.com/sitemaps-1-section-blog-1-sitemap-p1.xml https://www.esentire.com/sitemaps-1-section-blog-1-sitemap-p2.xml \
     --remove_404_records \
     --output obstracts/output/esentire_blog.json
 ```
@@ -132,7 +132,7 @@ python3 sitemap2posts.py https://www.aquasec.com/blog/ \
 ```shell
 python3 sitemap2posts.py https://arcticwolf.com/resources/blog/ \
     --lastmod_min 2020-01-01 \
-    --sitemap_urls https://arcticwolf.com/post-sitemap.xml,https://arcticwolf.com/post-sitemap2.xml,https://arcticwolf.com/post-sitemap3.xml,https://arcticwolf.com/post-sitemap4.xml \
+    --sitemap_urls https://arcticwolf.com/post-sitemap.xml https://arcticwolf.com/post-sitemap2.xml https://arcticwolf.com/post-sitemap3.xml https://arcticwolf.com/post-sitemap4.xml \
     --remove_404_records \
     --output obstracts/output/arcticwolf_blog.json
 ```
