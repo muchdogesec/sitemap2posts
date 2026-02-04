@@ -10,7 +10,26 @@ However, it is far from perfect. Sometimes WBM archives miss time periods, or si
 
 history4feed supports the ability to add posts in a feed manually to help solve this problem. However, this still requires you to get a list of missing posts.
 
-sitemap2posts is designed to identify all posts for a blog, using a specified URL path. It will then get all titles and published dates (using sitemap `lastmod` dates), and outputted in a json document the matches the required body format for each entry to be added to history4feed manually.
+sitemap2posts is designed to identify all posts for a blog, using sitemaps. It can automatically discover sitemaps from robots.txt or accept explicit sitemap URLs. The tool extracts all post URLs, titles, and published dates (using sitemap `lastmod` dates), and outputs them in a JSON document format that can be used with history4feed or synchronized directly to Obstracts feeds.
+
+## Features
+
+- **Two modes of operation:**
+  - `robots` mode: Automatically discovers sitemaps from robots.txt
+  - `sitemap_urls` mode: Directly specify sitemap URLs to crawl
+- **Advanced filtering:**
+  - Date-based filtering with `--lastmod_min`
+  - Path-based filtering with glob pattern support (`--path_ignore_list`, `--path_allow_list`)
+  - Sitemap exclusion (`--ignore_sitemaps`)
+  - Automatic 404 detection and removal (`--remove_404_records`)
+- **Obstracts Integration:**
+  - Direct synchronization to Obstracts feeds via API
+  - Bulk post creation with job-based processing
+  - GitHub Actions support with automated summaries
+- **Performance optimizations:**
+  - Parallel title fetching with ThreadPoolExecutor
+  - Combined 404 checking with title fetch (no duplicate requests)
+  - Efficient URL deduplication
 
 ## Install
 
@@ -25,30 +44,103 @@ source sitemap2posts-venv/bin/activate
 pip3 install -r requirements.txt
 ```
 
-## Run
+## Usage
+
+### Basic Usage (robots mode)
 
 ```shell
-python3 sitemap2posts.py https://www.crowdstrike.com/blog/ \
-	--lastmod_min 2024-01-01 \
-    --ignore_sitemaps https://www.crowdstrike.com/page-sitemap.xml,https://www.crowdstrike.com/epp101-sitemap.xml,https://www.crowdstrike.com/author-sitemap.xml \
-    --ignore_domain_paths https://www.crowdstrike.com/blog/author,https://www.crowdstrike.com/blog/videos/ \
-    --remove_404_records \
+python sitemap2posts.py https://www.crowdstrike.com/blog/ \
 	--output crowdstrike_blog.json
 ```
 
-Where:
+### With Date Filtering
 
-* `lastmod_min`: specify the minimum date for `lastmod` time found in sitemap. The input is expected in the format `YYYY-MM-DD`.
-* `ignore_sitemaps`: if you know a specific sitemap file you don't want to crawl, you can pass it here. Useful to reduce the number of request being made
-* `ignore_domain_paths`: will accept a comma-separated list of domains you want to filter out of the final output. Useful if there are nested pages in the blog you don't care about
-* `remove_404_records`: often sitemaps contain links to urls that resolve to 404s. To remove these records from the final sitemap, pass this flag
-* `output`: the output file name, should end in `.json`
+```shell
+python sitemap2posts.py https://www.crowdstrike.com/blog/ \
+	--lastmod_min 2024-01-01 \
+	--output crowdstrike_blog.json
+```
+
+### With Path Filtering (Glob Patterns)
+
+```shell
+# Ignore specific paths
+python sitemap2posts.py https://www.crowdstrike.com/blog/ \
+	--path_ignore_list /blog/author '*/tag/*' \
+	--output crowdstrike_blog.json
+
+# Only allow specific paths
+python sitemap2posts.py https://www.crowdstrike.com/blog/ \
+	--path_allow_list '/blog/*/2024/*' '/blog/*/2025/*' \
+	--output crowdstrike_blog.json
+
+# Combine allow and ignore lists
+python sitemap2posts.py https://www.crowdstrike.com/blog/ \
+	--path_allow_list '/blog/*' \
+	--path_ignore_list /blog/author '*/tag/*' \
+	--output crowdstrike_blog.json
+```
+
+### sitemap_urls Mode (Direct Sitemap URLs)
+
+```shell
+python sitemap2posts.py https://www.crowdstrike.com/blog/ \
+	https://www.crowdstrike.com/post-sitemap.xml \
+	https://www.crowdstrike.com/post-sitemap2.xml \
+	--mode sitemap_urls \
+	--output crowdstrike_blog.json
+```
+
+### Complete Example with All Filters
+
+```shell
+python sitemap2posts.py https://www.crowdstrike.com/blog/ \
+	--lastmod_min 2024-01-01 \
+	--ignore_sitemaps https://www.crowdstrike.com/page-sitemap.xml,https://www.crowdstrike.com/author-sitemap.xml \
+	--path_ignore_list /blog/author /blog/videos \
+	--remove_404_records \
+	--output crowdstrike_blog.json
+```
+
+## Command-Line Options
+
+* **`urls`** (positional): 
+  - In `robots` mode: Single blog URL
+  - In `sitemap_urls` mode: Blog URL followed by one or more sitemap URLs
+* **`--mode`**: Operation mode - `robots` (default) or `sitemap_urls`
+* **`--output`**: Output JSON file name (default: `sitemap_posts.json`)
+* **`--lastmod_min`**: Filter URLs with lastmod date on or after this date (format: `YYYY-MM-DD`)
+* **`--path_ignore_list`**: Path patterns to ignore. Supports glob patterns (`*`, `?`, `[...]`). Examples: `/blog/author`, `*/tag/*`, `https://example.com/*/archive`
+* **`--path_allow_list`**: Path patterns to allow. Supports glob patterns. Only URLs matching these patterns will be included. Examples: `/blog/post/*`, `*/2024/*`
+* **`--ignore_sitemaps`**: Comma-separated list of specific sitemap URLs to ignore
+* **`--remove_404_records`**: Exclude URLs that return a 404 status code (checked during title fetch to avoid duplicate requests)
+
+## Obstracts Integration
+
+sitemap2posts includes `obstracts_sync.py` for direct synchronization to Obstracts feeds. See [obstracts/README.md](obstracts/README.md) for detailed documentation.
+
+### Quick Start
+
+```shell
+# Set environment variables
+export OBSTRACTS_API_BASE_URL="https://management.obstracts.staging.signalscorps.com/obstracts_api"
+export OBSTRACTS_API_KEY="your-api-key"
+
+# Run sync
+python obstracts_sync.py obstracts/obstracts_config.json
+```
+
+Features:
+- Bulk post creation (all posts sent in single API request per feed)
+- Async job processing (doesn't wait for completion)
+- GitHub Actions integration with automated summaries
+- Multiple feed support with configuration file
 
 ## Examples
 
-We keep a history of all URLs for blogs we track in our [Awesome Threat Intel Blog list](https://github.com/muchdogesec/awesome_threat_intel_blogs) on Cloudflare.
+We keep a history of all URLs for blogs we track in our [Awesome Threat Intel Blog list](https://github.com/muchdogesec/awesome_threat_intel_blogs).
 
-See the `examples` directory for where to find the output JSON files.
+See the `examples/` directory for sample commands and outputs.
 
 ## How it works 
 
