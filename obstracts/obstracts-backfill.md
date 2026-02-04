@@ -97,7 +97,7 @@ python3 sitemap2posts.py https://www.dragos.com/blog/ \
     --output obstracts/output/dragos_blog.json
 ```
 
-### bitsight
+### bitsight (`1abb8bff-c1e6-556e-b56a-7d20b47a9b06`)
 
 ```shell
 python3 sitemap2posts.py https://www.bitsight.com/blog/ \
@@ -107,7 +107,7 @@ python3 sitemap2posts.py https://www.bitsight.com/blog/ \
     --output obstracts/output/bitsight_blog.json
 ```
 
-### binary defense
+### binary defense (`6a9b10fe-0158-502e-9ec2-79149fcf2ea1`)
 
 ```shell
 python3 sitemap2posts.py https://binarydefense.com/resources/blog/ \
@@ -117,7 +117,7 @@ python3 sitemap2posts.py https://binarydefense.com/resources/blog/ \
     --output obstracts/output/binarydefense_blog.json
 ```
 
-### aquasec
+### aquasec (`d38238bc-d753-5f81-9c0f-6f31a22d7d70`)
 
 ```shell
 python3 sitemap2posts.py https://www.aquasec.com/blog/ \
@@ -127,7 +127,7 @@ python3 sitemap2posts.py https://www.aquasec.com/blog/ \
     --output obstracts/output/aquasec_blog.json
 ```
 
-### arctic wolf
+### arctic wolf (`9102b220-4788-567a-bd30-8135d28fa43e`)
 
 ```shell
 python3 sitemap2posts.py https://arcticwolf.com/resources/blog/ \
