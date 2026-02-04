@@ -6,17 +6,18 @@ Bad = sitemap approach does not work
 
 ## Good
 
-### SpectorOps
+### SpectorOps (`1ae489cf-f335-57a8-b96d-c87e1cd0eb78`)
 
 ```shell
 python3 sitemap2posts.py https://specterops.io/blog/ \
+    --path_allow_list 'https://specterops.io/blog/*' \
     --lastmod_min 2020-01-01 \
     --sitemap_urls https://specterops.io/sitemap_index.xml \
     --remove_404_records \
     --output obstracts/output/specterops_blog.json
 ```
 
-### Expel
+### Expel (`57f65a6f-fb84-5fd7-ba2b-6623322224fb`)
 
 ```shell
 python3 sitemap2posts.py https://expel.com/blog/ \
@@ -26,7 +27,7 @@ python3 sitemap2posts.py https://expel.com/blog/ \
     --output obstracts/output/expel_blog.json
 ```
 
-### Hunt.io
+### Hunt.io (`98d67329-7040-5562-b5e6-876377cf6ae2`)
 
 ```shell
 python3 sitemap2posts.py https://hunt.io/blog \
@@ -37,7 +38,7 @@ python3 sitemap2posts.py https://hunt.io/blog \
 
 No modified dates.
 
-### Volexity
+### Volexity (`85818f22-92ff-5c68-8dc1-a9c6d6e505ec`)
 
 ```shell
 python3 sitemap2posts.py https://www.volexity.com/blog/ \
@@ -47,7 +48,7 @@ python3 sitemap2posts.py https://www.volexity.com/blog/ \
     --output obstracts/output/volexity_blog.json
 ```
 
-### esentire
+### esentire (`5cb0ff18-841e-5f46-8529-ca6f41e22d0b`)
 
 ```shell
 python3 sitemap2posts.py https://www.esentire.com/blog/ \
@@ -57,37 +58,37 @@ python3 sitemap2posts.py https://www.esentire.com/blog/ \
     --output obstracts/output/esentire_blog.json
 ```
 
-### ZScalar
+### ZScalar (`dcb31053-0a55-5fcd-ba0e-975cdae7dce8`)
 
 ```shell
-python3 sitemap2posts.py https://www.zscaler.com/blogs/ \
+python3 sitemap2posts.py https://www.zscaler.com/blogs/security-research/ \
     --lastmod_min 2020-01-01 \
     --sitemap_urls https://www.zscaler.com/sitemap.xml \
     --remove_404_records \
     --output obstracts/output/zscaler_blog.json
 ```
 
-### zimperium
+### zimperium (`c069b35f-90a0-534e-a445-c54d97ad0068`)
 
 ```shell
-python3 sitemap2posts.py https://www.zimperium.com/blog/\
+python3 sitemap2posts.py https://www.zimperium.com/blog/ \
     --lastmod_min 2020-01-01 \
     --sitemap_urls https://zimperium.com/sitemap.xml \
     --remove_404_records \
     --output obstracts/output/zimperium_blog.json
 ```
 
-### securityscorecard
+### securityscorecard (`4d944236-3671-5881-a3bd-ae37c766406f`)
 
 ```shell
-python3 sitemap2posts.py https://securityscorecard.com/blog/\
+python3 sitemap2posts.py https://securityscorecard.com/blog/ \
     --lastmod_min 2020-01-01 \
     --sitemap_urls https://securityscorecard.com/blog-sitemap.xml \
     --remove_404_records \
     --output obstracts/output/securityscorecard_blog.json
 ```
 
-### dragos
+### dragos (`39740aa2-052e-53ca-ad1e-32d10b79cc63`)
 
 ```shell
 python3 sitemap2posts.py https://www.dragos.com/blog/ \
