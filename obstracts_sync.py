@@ -17,7 +17,7 @@ from typing import List, Dict, Optional
 import requests
 
 # Import the sitemap2posts function
-from sitemap2posts import sitemap2posts
+from sitemap2posts import sitemap2posts, lastmod_default
 
 # Set up logging
 logging.basicConfig(
@@ -232,12 +232,14 @@ def prepare_post_data(post: Dict) -> Dict:
     Returns:
         Dictionary formatted for Obstracts API
     """
-    pubdate = post.get('pubdate', datetime.now(timezone.utc).isoformat())
+    pubdate = post.get('lastmod', lastmod_default.isoformat())
     data = {
         'link': post['url'],
         'title': post['title'],
         'pubdate': pubdate,
     }
+    if 'authors' in post:
+        data['author'] = post['authors']
     return data
 
 

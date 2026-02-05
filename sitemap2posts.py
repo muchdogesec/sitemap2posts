@@ -8,11 +8,15 @@ import logging
 from datetime import datetime, timezone
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from fnmatch import fnmatch
+from newspaper import Article
+from htmldate import find_date
 
 # Set up logging
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
+
+lastmod_default = datetime.now(timezone.utc)
 
 
 def fetch_url(url, timeout=10):
@@ -104,14 +108,20 @@ def get_post_title(url, check_404=False):
         check_404: If True, return None for 404 responses instead of fetching title
 
     Returns:
-        Tuple of (title, is_valid) where is_valid indicates if URL is not 404
+        Tuple of (data, is_valid) where is_valid indicates if URL is not 404
     """
     logging.debug(f"Fetching post title from {url}")
     response = fetch_url(url)
 
+    data = dict()
+
     if not response:
         logging.debug(f"Failed to fetch URL {url}")
-        return "Failed to Retrieve", False
+        return None, False
+
+    last_modified = response.headers.get("Last-Modified")
+    if last_modified:
+        data["last_modified_header"] = last_modified
 
     # Check for 404 if requested
     if check_404 and response.status_code == 404:
@@ -120,15 +130,35 @@ def get_post_title(url, check_404=False):
 
     if response.status_code != 200:
         logging.debug(f"Failed to fetch URL {url}")
-        return "Failed to Retrieve", False
+        return None, False
+    
+    article = Article(url)
+    article.download(input_html=response.text)
+    article.parse()
+    data["title"] = article.title.strip()
+    meta_keywords = [kw for kw in article.meta_keywords if kw.strip()]
+    if meta_keywords:
+        data["meta_keywords"] = meta_keywords
+    if article.publish_date:
+        data["publish_date"] = article.publish_date and article.publish_date.isoformat()
+    if article.tags:
+        data["tags"] = list(article.tags)
+    if article.meta_description:
+        data["meta_description"] = article.meta_description.strip()
+    if article.authors:
+        data["authors"] = '; '.join(article.authors)
+    date = find_date(response.text, url=url, extensive_search=True)
+    if date:
+        data["htmldate"] = date
 
-    soup = BeautifulSoup(response.content, "html.parser")
-    title = soup.title.string if soup.title else "No Title"
-    logging.debug(f"Successfully fetched title: {title}")
-    return title.strip(), True
+    logging.debug(f"Successfully fetched title: {data['title']}")
+    return data, True
 
 
 def save_to_json(posts, output_filename="sitemap_posts.json"):
+    for post in posts:
+        if post["lastmod"] is None:
+            post["lastmod"] = lastmod_default.isoformat()
 
     # Sort posts by sitemap first, and then by lastmod (newest first)
     sorted_posts = sorted(
@@ -147,10 +177,11 @@ def parse_lastmod(lastmod_str):
     """Parse lastmod date string to datetime object."""
     if lastmod_str is None:
         logging.warning(f"Lastmod is None, assigning a default date.")
-        return datetime.min.replace(tzinfo=timezone.utc)
+        return lastmod_default
 
     formats = [
         "%Y-%m-%dT%H:%M:%S%z",  # Full ISO 8601 format with timezone
+        "%Y-%m-%dT%H:%M:%S.%f%z",  # Full ISO 8601 format with timezone and microseconds
         "%Y-%m-%dT%H:%M:%S",  # ISO 8601 without timezone
         "%Y-%m-%d",  # Simple date format
     ]
@@ -297,22 +328,22 @@ def fetch_post_titles(urls, remove_404_records=False):
         for future in as_completed(future_to_url):
             url = future_to_url[future]
             try:
-                title, is_valid = future.result()
+                html_data, is_valid = future.result()
 
                 # Skip if 404 and we're filtering them out
                 if remove_404_records and not is_valid:
                     continue
 
                 # Skip if title is None (404 case)
-                if title is None:
+                if html_data is None:
                     continue
 
                 posts.append(
                     {
                         "url": url,
                         "lastmod": urls[url]["lastmod"],
-                        "title": title,
                         "sitemap": urls[url]["sitemap"],
+                        **html_data,
                     }
                 )
             except Exception as e:
@@ -338,7 +369,7 @@ def sitemap2posts(
     remove_404_records=False,
 ):
     """Main function to crawl sitemaps and extract post information."""
-    
+
     if not sitemap_urls:
         logging.info("Using sitemaps from robots.txt")
         sitemap_urls = get_sitemaps_from_robots(blog_url)
