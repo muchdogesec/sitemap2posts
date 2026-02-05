@@ -22,7 +22,14 @@ lastmod_default = datetime.now(timezone.utc)
 def fetch_url(url, timeout=10):
     """Fetch URL with error handling."""
     try:
-        response = requests.get(url, timeout=timeout)
+        response = requests.get(
+            url,
+            timeout=timeout,
+            headers={
+                "User-Agent": "Sitemap2post/0.0.1 (+https://github.com/muchdogesec/sitemap2posts)"
+            },
+        )
+
         return response
     except requests.RequestException as e:
         logging.error(f"Error fetching {url}: {e}")
@@ -81,7 +88,7 @@ def get_sitemap_urls(sitemap_url):
     response = fetch_url(sitemap_url)
 
     if not response or response.status_code != 200:
-        logging.error(f"Failed to fetch sitemap from {sitemap_url}")
+        logging.error(f"Failed to fetch sitemap from {sitemap_url}: {response.reason}")
         return [], False
 
     soup = BeautifulSoup(response.content, "lxml-xml")
@@ -131,7 +138,7 @@ def get_post_title(url, check_404=False):
     if response.status_code != 200:
         logging.debug(f"Failed to fetch URL {url}")
         return None, False
-    
+
     article = Article(url)
     article.download(input_html=response.text)
     article.parse()
@@ -146,7 +153,7 @@ def get_post_title(url, check_404=False):
     if article.meta_description:
         data["meta_description"] = article.meta_description.strip()
     if article.authors:
-        data["authors"] = '; '.join(article.authors)
+        data["authors"] = "; ".join(article.authors)
     date = find_date(response.text, url=url, extensive_search=True)
     if date:
         data["htmldate"] = date
@@ -252,8 +259,9 @@ def filter_urls_by_lastmod(urls, lastmod_min):
     for url, data in urls.items():
         if data["lastmod"]:
             parsed_lastmod = parse_lastmod(data["lastmod"])
-            if parsed_lastmod and is_date_after_min(parsed_lastmod, lastmod_min):
-                filtered[url] = data
+            if parsed_lastmod and not is_date_after_min(parsed_lastmod, lastmod_min):
+                continue
+        filtered[url] = data
 
     return filtered
 

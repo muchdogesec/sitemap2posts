@@ -240,6 +240,8 @@ def prepare_post_data(post: Dict) -> Dict:
     }
     if 'authors' in post:
         data['author'] = post['authors']
+    if 'tags' in post:
+        data['categories'] = post['tags']
     return data
 
 
