@@ -10,6 +10,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from fnmatch import fnmatch
 from newspaper import Article
 from htmldate import find_date
+from email.utils import parsedate_to_datetime
+from dateutil.parser import parse as parse_dt
 
 # Set up logging
 logging.basicConfig(
@@ -17,6 +19,27 @@ logging.basicConfig(
 )
 
 lastmod_default = datetime.now(timezone.utc)
+
+# Save the original default method
+JSONEncoder_olddefault = json.JSONEncoder.default
+
+# Define the new default method
+def JSONEncoder_newdefault(self, obj):
+    if isinstance(obj, datetime):
+        if obj.tzinfo is None:
+            obj = obj.replace(tzinfo=timezone.utc)
+        return obj.isoformat()
+    # Call the original method for other types
+    return JSONEncoder_olddefault(self, obj)
+
+# Replace the default method with the new one
+json.JSONEncoder.default = JSONEncoder_newdefault
+
+def make_dt_utc(dt: datetime) -> datetime:
+    """Convert a datetime to UTC if it is naive."""
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(timezone.utc)
 
 
 def fetch_url(url, timeout=10):
@@ -71,9 +94,11 @@ def parse_sitemap_content(soup, sitemap_url):
         for url in soup.find_all("url"):
             loc = url.find("loc")
             lastmod = url.find("lastmod")
+            if lastmod:
+                lastmod = make_dt_utc(parse_dt(lastmod.text.strip()))
             if loc:
                 urls.append(
-                    (loc.text.strip(), lastmod.text.strip() if lastmod else None)
+                    (loc.text.strip(), lastmod)
                 )
         logging.info(f"Found {len(urls)} URL(s) in sitemap")
         return urls, False
@@ -128,7 +153,7 @@ def get_post_title(url, check_404=False):
 
     last_modified = response.headers.get("Last-Modified")
     if last_modified:
-        data["last_modified_header"] = last_modified
+        data["modified_header"] = make_dt_utc(parsedate_to_datetime(last_modified))
 
     # Check for 404 if requested
     if check_404 and response.status_code == 404:
@@ -147,16 +172,16 @@ def get_post_title(url, check_404=False):
     if meta_keywords:
         data["meta_keywords"] = meta_keywords
     if article.publish_date:
-        data["publish_date"] = article.publish_date and article.publish_date.isoformat()
+        data["publish_date"] = make_dt_utc(article.publish_date)
     if article.tags:
         data["tags"] = list(article.tags)
     if article.meta_description:
         data["meta_description"] = article.meta_description.strip()
     if article.authors:
         data["authors"] = "; ".join(article.authors)
-    date = find_date(response.text, url=url, extensive_search=True)
+    date = find_date(response.text, url=url, extensive_search=True, outputformat="%Y-%m-%dT%H:%M:%S%z")
     if date:
-        data["htmldate"] = date
+        data["htmldate"] = make_dt_utc(datetime.fromisoformat(date))
 
     logging.debug(f"Successfully fetched title: {data['title']}")
     return data, True
@@ -169,7 +194,7 @@ def save_to_json(posts, output_filename="sitemap_posts.json"):
 
     # Sort posts by sitemap first, and then by lastmod (newest first)
     sorted_posts = sorted(
-        posts, key=lambda x: (x["sitemap"], parse_lastmod(x["lastmod"])), reverse=True
+        posts, key=lambda x: (x["sitemap"], x["lastmod"]), reverse=True
     )
     logging.info(f"Saving results to {output_filename}")
     try:
@@ -178,34 +203,6 @@ def save_to_json(posts, output_filename="sitemap_posts.json"):
         logging.info(f"JSON saved successfully with {len(posts)} post(s)")
     except IOError as e:
         logging.error(f"Failed to save JSON to {output_filename}: {e}")
-
-
-def parse_lastmod(lastmod_str):
-    """Parse lastmod date string to datetime object."""
-    if lastmod_str is None:
-        logging.warning(f"Lastmod is None, assigning a default date.")
-        return lastmod_default
-
-    formats = [
-        "%Y-%m-%dT%H:%M:%S%z",  # Full ISO 8601 format with timezone
-        "%Y-%m-%dT%H:%M:%S.%f%z",  # Full ISO 8601 format with timezone and microseconds
-        "%Y-%m-%dT%H:%M:%S",  # ISO 8601 without timezone
-        "%Y-%m-%d",  # Simple date format
-    ]
-
-    for fmt in formats:
-        try:
-            parsed_date = datetime.strptime(lastmod_str, fmt)
-            logging.debug(f"Parsed '{lastmod_str}' using format '{fmt}'")
-            if parsed_date.tzinfo is None:
-                parsed_date = parsed_date.replace(tzinfo=timezone.utc)
-            return parsed_date
-        except ValueError:
-            continue
-
-    logging.warning(f"Failed to parse lastmod date: {lastmod_str}")
-    return None
-
 
 def is_date_after_min(lastmod_parsed, lastmod_min):
     """Check if parsed date is after the minimum date."""
@@ -258,7 +255,7 @@ def filter_urls_by_lastmod(urls, lastmod_min):
 
     for url, data in urls.items():
         if data["lastmod"]:
-            parsed_lastmod = parse_lastmod(data["lastmod"])
+            parsed_lastmod = data["lastmod"]
             if parsed_lastmod and not is_date_after_min(parsed_lastmod, lastmod_min):
                 continue
         filtered[url] = data

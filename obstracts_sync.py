@@ -24,7 +24,8 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
-
+DEFAULT_PREFERRED_DATE = 'LPHM'  # Default order: Lastmod, Publish_date, Htmldate, Modified_header
+DEFAULT_OMIT_AUTHOR = False  # Default: include author information
 
 class GitHubActionsOutput:
     """Handle GitHub Actions output formatting."""
@@ -221,24 +222,63 @@ def save_config(config_path: str, config: Dict):
         logging.error(f"Failed to save configuration: {e}")
 
 
-def prepare_post_data(post: Dict) -> Dict:
+def extract_date_from_post(post: Dict, preferred_date: str) -> Optional[datetime]:
+    """
+    Extract date from post based on preferred_date order.
+    
+    Args:
+        post: Post dictionary from sitemap2posts
+        preferred_date: String like 'LHPM' where:
+            L = lastmod (from sitemap)
+            H = htmldate (extracted from HTML content)
+            P = publish_date (from article metadata)
+            M = modified_header (from HTTP Last-Modified header)
+    
+    Returns:
+        datetime object or None
+    """
+    date_map = {
+        'L': 'lastmod',
+        'H': 'htmldate',
+        'P': 'publish_date',
+        'M': 'modified_header'
+    }
+    
+    for char in preferred_date.upper():
+        if char not in date_map:
+            continue
+        
+        field = date_map[char]
+        value = post.get(field)
+        
+        if value:
+            return value
+    
+    return None
+
+
+def prepare_post_data(post: Dict, omit_author: bool) -> Dict:
     """
     Prepare post data for Obstracts API.
     
     Args:
         post: Post dictionary from sitemap2posts
-        profile_id: Optional profile ID to associate with the post
     
     Returns:
         Dictionary formatted for Obstracts API
     """
-    pubdate = post.get('lastmod', lastmod_default.isoformat())
+    # Extract date using preferred_date order
+
+    extracted_date = post['_extracted_date'] or lastmod_default
+    pubdate = extracted_date.isoformat()
+
+    
     data = {
         'link': post['url'],
         'title': post['title'],
         'pubdate': pubdate,
     }
-    if 'authors' in post:
+    if not omit_author and 'authors' in post:
         data['author'] = post['authors']
     if 'tags' in post:
         data['categories'] = post['tags']
@@ -344,8 +384,42 @@ def process_feed(
     
     logging.info(f"Found {len(posts)} posts for feed {feed_id}")
     
-    # Prepare posts for API (without profile_id in individual posts)
-    api_posts = [prepare_post_data(post) for post in posts]
+    # Get preferred_date configuration (default to 'L' for lastmod only)
+    preferred_date = feed_config.get('preferred_date', DEFAULT_PREFERRED_DATE)
+    logging.info(f"Using preferred_date order: {preferred_date}")
+    
+    # Get omit_author configuration (default to False)
+    omit_author = feed_config.get('omit_author', DEFAULT_OMIT_AUTHOR)
+    
+    # Extract dates and filter posts by lastmod_min using the extracted date
+    posts_with_dates = []
+    for post in posts:
+        extracted_date = extract_date_from_post(post, preferred_date)
+        
+        # Apply lastmod_min filter using the extracted date
+        if lastmod_min_date and extracted_date:
+            if extracted_date < lastmod_min_date:
+                logging.debug(f"Filtering out {post['url']}: {extracted_date.isoformat()} < {lastmod_min_date.isoformat()}")
+                continue
+        
+        # Store extracted date in post for prepare_post_data
+        post['_extracted_date'] = extracted_date
+        posts_with_dates.append(post)
+    
+    if not posts_with_dates:
+        logging.warning(f"Feed {feed_id}: No posts remaining after date filtering")
+        return {
+            'feed_id': feed_id,
+            'posts_count': 0,
+            'job_id': None,
+            'success': True,
+            'message': 'No posts remaining after date filtering'
+        }
+    
+    logging.info(f"{len(posts_with_dates)} posts remaining after date filtering")
+    
+    # Prepare posts for API using the preferred_date order
+    api_posts = [prepare_post_data(post, omit_author) for post in posts_with_dates]
     
     # Upload posts to Obstracts as a single bulk request
     job_response = api_client.create_posts_bulk(feed_id, profile_id, api_posts)
@@ -364,10 +438,10 @@ def process_feed(
     
     return {
         'feed_id': feed_id,
-        'posts_count': len(posts),
+        'posts_count': len(posts_with_dates),
         'job_id': job_id,
         'success': True,
-        'message': f'Submitted {len(posts)} posts'
+        'message': f'Submitted {len(posts_with_dates)} posts'
     }
 
 

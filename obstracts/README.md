@@ -41,6 +41,8 @@ Create a JSON configuration file (e.g., `obstracts_config.json`) with your feed 
                 "https://krebsonsecurity.com/post-sitemap.xml"
             ],
             "profile_id": "profile-uuid-here",
+            "preferred_date": "LHPM",
+            "omit_author": true,
             "lastmod_min": "2024-01-01",
             "path_ignore_list": [
                 "/blog/author",
@@ -67,7 +69,15 @@ Each feed in the configuration supports the following options:
   - If provided, automatically uses sitemap_urls mode
   - If omitted, uses robots mode (discovers sitemaps from robots.txt)
 - **profile_id** (required): Profile UUID to associate with posts
-- **lastmod_min** (optional): Filter posts with lastmod on or after this date (YYYY-MM-DD format)
+- **preferred_date** (optional, default: `"LPHM"`): Order of date sources to try for post publication date. Each character represents a date source:
+  - `L` = lastmod (from sitemap `<lastmod>` tag)
+  - `H` = htmldate (extracted from HTML content using htmldate library)
+  - `P` = publish_date (from article metadata using newspaper3k)
+  - `M` = modified_header (from HTTP `Last-Modified` header)
+  - Example: `"LHPM"` tries lastmod first, falls back to htmldate, then publish_date, then modified_header
+  - The extracted date is used both for `lastmod_min` filtering and as the `pubdate` in API requests
+- **omit_author** (optional, default: `false`): Whether to exclude author information from posts sent to the API
+- **lastmod_min** (optional): Filter posts with date on or after this date (YYYY-MM-DD format)
   - Should be retrieved from the Obstracts API server unless manually set
   - This value is removed from the config file after each run
 - **path_ignore_list** (optional): Array of URL path patterns to ignore. Supports glob patterns with wildcards `*`, `?`, and `[...]`
