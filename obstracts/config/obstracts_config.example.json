@@ -1,0 +1,32 @@
+{
+    "feeds": [
+        {
+            "feed_id": "5f80eb58-bf41-508c-9609-463c40f29505",
+            "blog_url": "https://www.crowdstrike.com/blog/",
+            "profile_id": "0bfbb57c-26b5-5182-9bb6-2dbc3419dcf4",
+            "omit_author": true,
+            "path_allow_list": [
+                "*/blog/how*"
+            ]
+        },
+        {
+            "feed_id": "dbc4aab8-d024-5489-8574-32377de71432",
+            "blog_url": "https://krebsonsecurity.com/",
+            "sitemap_urls": [
+                "https://krebsonsecurity.com/wp-sitemap-posts-post-2.xml"
+            ],
+            "profile_id": "0bfbb57c-26b5-5182-9bb6-2dbc3419dcf4",
+            "preferred_date": "LHPM",
+            "path_ignore_list": [
+                "/blog/author",
+                "*/tag/*",
+                "*/archive"
+            ],
+            "path_allow_list": [
+                "/blog/*",
+                "*/2024/*"
+            ],
+            "remove_404_records": true
+        }
+    ]
+}
