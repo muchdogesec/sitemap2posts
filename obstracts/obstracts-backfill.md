@@ -97,9 +97,15 @@ python3 sitemap2posts.py https://binarydefense.com/resources/blog/ \
     --output obstracts/output/binarydefense_blog.json
 ```
 
----
+### zimperium (`c069b35f-90a0-534e-a445-c54d97ad0068`)
 
-## Issues -- unsure cause
+```shell
+python3 sitemap2posts.py https://zimperium.com/blog/ \
+    --lastmod_min 2020-01-01 \
+    --sitemap_urls https://zimperium.com/sitemap.xml \
+    --remove_404_records \
+    --output obstracts/output/zimperium_blog.json
+```
 
 ### cyera
 
@@ -110,15 +116,7 @@ python3 sitemap2posts.py https://www.cyera.com/research-labs \
     --output obstracts/output/cyera_blog.json
 ```
 
-### zimperium (`c069b35f-90a0-534e-a445-c54d97ad0068`)
-
-```shell
-python3 sitemap2posts.py https://www.zimperium.com/blog/ \
-    --lastmod_min 2020-01-01 \
-    --sitemap_urls https://zimperium.com/sitemap.xml \
-    --remove_404_records \
-    --output obstracts/output/zimperium_blog.json
-```
+(occassional 403s)
 
 ### securityscorecard (`4d944236-3671-5881-a3bd-ae37c766406f`)
 
@@ -130,6 +128,8 @@ python3 sitemap2posts.py https://securityscorecard.com/blog/ \
     --output obstracts/output/securityscorecard_blog.json
 ```
 
+(occassional 403s)
+
 ### aquasec (`d38238bc-d753-5f81-9c0f-6f31a22d7d70`)
 
 ```shell
@@ -140,6 +140,8 @@ python3 sitemap2posts.py https://www.aquasec.com/blog/ \
     --output obstracts/output/aquasec_blog.json
 ```
 
+(occassional 403s)
+
 ### arctic wolf (`9102b220-4788-567a-bd30-8135d28fa43e`)
 
 ```shell
@@ -149,6 +151,8 @@ python3 sitemap2posts.py https://arcticwolf.com/resources/blog/ \
     --remove_404_records \
     --output obstracts/output/arcticwolf_blog.json
 ```
+
+(occassional 403s)
 
 ---
 

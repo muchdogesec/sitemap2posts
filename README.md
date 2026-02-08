@@ -15,8 +15,10 @@ sitemap2posts is designed to identify all posts for a blog, using sitemaps. It c
 ## Features
 
 - **Two modes of operation:**
-  - `robots` mode: Automatically discovers sitemaps from robots.txt
+  - `robots` mode (default): Automatically discovers sitemaps from robots.txt
   - `sitemap_urls` mode: Directly specify sitemap URLs to crawl
+- **Smart data extraction**
+	- Will extract title, authors and publish date from the report
 - **Advanced filtering:**
   - Date-based filtering with `--lastmod_min`
   - Path-based filtering with glob pattern support (`--path_ignore_list`, `--path_allow_list`)
@@ -119,12 +121,14 @@ sitemap2posts includes `obstracts_sync.py` for direct synchronization to Obstrac
 
 ```shell
 # Set environment variables
-export OBSTRACTS_API_BASE_URL="https://management.obstracts.staging.signalscorps.com/obstracts_api"
-export OBSTRACTS_API_KEY="your-api-key"
+export OBSTRACTS_API_BASE_URL="<OBSTRACTS WEB TOKEN>"
+export OBSTRACTS_API_KEY="<YOUR OBSTRACTS WEB TOKEN>"
 
 # Run sync
 python obstracts_sync.py obstracts/obstracts_config.json
 ```
+
+Note, this repo runs a daily action to post data to Obstracts web. The secrets (shown above) are stored in the `github-action` environment.
 
 Features:
 - Bulk post creation (all posts sent in single API request per feed)
