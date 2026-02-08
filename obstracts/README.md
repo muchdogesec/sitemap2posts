@@ -195,7 +195,7 @@ See `.github/workflows/obstracts-sync.yml` for a complete example that:
 ### With Cron
 
 ```bash
-# Run every day at 2 AM
+# Run every day at 8 AM
 0 8 * * * cd /path/to/sitemap2posts && /path/to/python obstracts_sync.py obstracts_config.json
 ```
 
