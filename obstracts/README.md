@@ -17,8 +17,8 @@ This tool synchronizes blog posts from sitemaps to Obstracts feeds using the Obs
 Set the following environment variables:
 
 ```bash
-export OBSTRACTS_API_BASE_URL="https://management.obstracts.staging.signalscorps.com/obstracts_api"
-export OBSTRACTS_API_KEY="your-api-key-here"
+export OBSTRACTS_API_BASE_URL="<OBSTRACTS WEB TOKEN>"
+export OBSTRACTS_API_KEY="<YOUR OBSTRACTS WEB TOKEN>"
 ```
 
 ### Configuration File
