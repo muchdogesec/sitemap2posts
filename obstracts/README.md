@@ -183,7 +183,7 @@ The following outputs are available for use in subsequent workflow steps:
 ### Example Workflow
 
 See `.github/workflows/obstracts-sync.yml` for a complete example that:
-- Runs on a schedule (daily at 2 AM)
+- Runs on a schedule (daily at 8 AM)
 - Can be triggered manually
 - Installs dependencies
 - Runs the sync
@@ -196,7 +196,7 @@ See `.github/workflows/obstracts-sync.yml` for a complete example that:
 
 ```bash
 # Run every day at 2 AM
-0 2 * * * cd /path/to/sitemap2posts && /path/to/python obstracts_sync.py obstracts_config.json
+0 8 * * * cd /path/to/sitemap2posts && /path/to/python obstracts_sync.py obstracts_config.json
 ```
 
 ### With GitHub Actions
