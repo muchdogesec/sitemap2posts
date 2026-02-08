@@ -1,0 +1,18 @@
+{
+    "feeds": [
+        {
+            "feed_id": "1ae489cf-f335-57a8-b96d-c87e1cd0eb78",
+            "blog_url": "https://specterops.io/blog/",
+            "sitemap_urls": [
+                "https://specterops.io/post-sitemap.xml"
+            ],
+            "profile_id": "3d9af85e-dc3f-5ac8-951f-aa26ef74086a",
+            "remove_404_records": true,
+            "path_allow_list": [
+                "https://specterops.io/blog/*"
+            ],
+            "omit_author": false,
+            "preferred_date": "P"
+        }
+    ]
+}

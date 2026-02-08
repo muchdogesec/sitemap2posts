@@ -1,0 +1,32 @@
+name: Obstracts Feed Sync
+
+on:
+  schedule:
+    # Run every day at 8 AM UTC
+    - cron: "0 8 * * *"
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  sync-feeds:
+    runs-on: ubuntu-latest
+    environment: "github-action"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run Obstracts sync
+        env:
+          OBSTRACTS_API_BASE_URL: ${{ secrets.OBSTRACTS_API_BASE_URL }}
+          OBSTRACTS_API_KEY: ${{ secrets.OBSTRACTS_API_KEY }}
+        run: |
+          python obstracts_sync.py obstracts/config/obstracts_config.json

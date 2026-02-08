@@ -10,7 +10,28 @@ However, it is far from perfect. Sometimes WBM archives miss time periods, or si
 
 history4feed supports the ability to add posts in a feed manually to help solve this problem. However, this still requires you to get a list of missing posts.
 
-sitemap2posts is designed to identify all posts for a blog, using a specified URL path. It will then get all titles and published dates (using sitemap `lastmod` dates), and outputted in a json document the matches the required body format for each entry to be added to history4feed manually.
+sitemap2posts is designed to identify all posts for a blog, using sitemaps. It can automatically discover sitemaps from robots.txt or accept explicit sitemap URLs. The tool extracts all post URLs, titles, and published dates (using sitemap `lastmod` dates), and outputs them in a JSON document format that can be used with history4feed or synchronized directly to Obstracts feeds.
+
+## Features
+
+- **Two modes of operation:**
+  - `robots` mode (default): Automatically discovers sitemaps from robots.txt
+  - `sitemap_urls` mode: Directly specify sitemap URLs to crawl
+- **Smart data extraction**
+	- Will extract title, authors and publish date from the report
+- **Advanced filtering:**
+  - Date-based filtering with `--lastmod_min`
+  - Path-based filtering with glob pattern support (`--path_ignore_list`, `--path_allow_list`)
+  - Sitemap exclusion (`--ignore_sitemaps`)
+  - Automatic 404 detection and removal (`--remove_404_records`)
+- **Obstracts Integration:**
+  - Direct synchronization to Obstracts feeds via API
+  - Bulk post creation with job-based processing
+  - GitHub Actions support with automated summaries
+- **Performance optimizations:**
+  - Parallel title fetching with ThreadPoolExecutor
+  - Combined 404 checking with title fetch (no duplicate requests)
+  - Efficient URL deduplication
 
 ## Install
 
@@ -28,158 +49,33 @@ pip3 install -r requirements.txt
 ## Run
 
 ```shell
-python3 sitemap2posts.py https://www.crowdstrike.com/blog/ \
-	--lastmod_min 2024-01-01 \
-    --ignore_sitemaps https://www.crowdstrike.com/page-sitemap.xml,https://www.crowdstrike.com/epp101-sitemap.xml,https://www.crowdstrike.com/author-sitemap.xml \
-    --ignore_domain_paths https://www.crowdstrike.com/blog/author,https://www.crowdstrike.com/blog/videos/ \
-    --remove_404_records \
-	--output crowdstrike_blog.json
+python sitemap2posts.py BLOG_URL
 ```
 
-Where:
+### Command-Line Options
 
-* `lastmod_min`: specify the minimum date for `lastmod` time found in sitemap. The input is expected in the format `YYYY-MM-DD`.
-* `ignore_sitemaps`: if you know a specific sitemap file you don't want to crawl, you can pass it here. Useful to reduce the number of request being made
-* `ignore_domain_paths`: will accept a comma-separated list of domains you want to filter out of the final output. Useful if there are nested pages in the blog you don't care about
-* `remove_404_records`: often sitemaps contain links to urls that resolve to 404s. To remove these records from the final sitemap, pass this flag
-* `output`: the output file name, should end in `.json`
+* **`blog_url`** (positional): Blog URL to extract posts from
+* **`--sitemap_urls`**: One or more sitemap URLs to crawl directly (automatically uses sitemap_urls mode instead of robots mode)
+* **`--output`**: Output JSON file name (default: `sitemap_posts.json`)
+* **`--lastmod_min`**: Filter URLs with lastmod date on or after this date (format: `YYYY-MM-DD`)
+* **`--path_ignore_list`**: Path patterns to ignore. Supports glob patterns (`*`, `?`, `[...]`). Examples: `/blog/author`, `*/tag/*`, `https://example.com/*/archive`
+* **`--path_allow_list`**: Path patterns to allow. Supports glob patterns. Only URLs matching these patterns will be included. Examples: `/blog/post/*`, `*/2024/*`
+* **`--ignore_sitemaps`**: Comma-separated list of specific sitemap URLs to ignore
+* **`--remove_404_records`**: Exclude URLs that return a 404 status code (checked during title fetch to avoid duplicate requests)
 
-## Examples
+### Examples
 
-We keep a history of all URLs for blogs we track in our [Awesome Threat Intel Blog list](https://github.com/muchdogesec/awesome_threat_intel_blogs) on Cloudflare.
+See the `examples/` directory for sample commands showing how to use this script.
 
-See the `examples` directory for where to find the output JSON files.
+## Obstracts Integration
 
-## How it works 
+sitemap2posts includes `obstracts_sync.py` for direct synchronization to Obstracts feeds.
 
-### Step 1: User enters URL
+See [obstracts/README.md](obstracts/README.md) for detailed documentation.
 
-A user enters the base URL of a blog. e.g. `https://www.crowdstrike.com/blog/`
+## Useful link
 
-Note, the URL entered is important, as the sitemap entries will be filtered by sitemap2posts to only consider those that start with the url entered.
-
-e.g. using the above example, `https://www.crowdstrike.com/blog/post.html` will be outputted, `https://www.crowdstrike.com/post.html` will not.
-
-### Step 2: Script grabs sitemap
-
-To do this the script hits the `robot.txt` file of the root URL.
-
-e.g. `https://www.crowdstrike.com/robot.txt`
-
-This can return one or more `Sitemap` entries.
-
-```txt
-User-agent: *
-Sitemap: https://www.crowdstrike.com/sitemap_index.xml
-Sitemap: https://www.crowdstrike.com/blog/sitemap_index.xml
-Sitemap: https://www.crowdstrike.com/falcon-sitemap.xml
-```
-
-### Step 3: Script crawls all URLs in the sitemaps
-
-The script then opens each sitemap file listed in robots.txt
-
-This can point to a sitemap directl (e.g. `https://0xtoxin.github.io/robots.txt`)
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>http://www.example.com/</loc>
-    <lastmod>2024-10-01</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
-  </url>
-  
-  <url>
-    <loc>http://www.example.com/about</loc>
-    <lastmod>2024-09-25</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  
-  <url>
-    <loc>http://www.example.com/contact</loc>
-    <lastmod>2024-09-20</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-  </url>
-</urlset>
-```
-
-Or a sitemap index
-
-e.g. `https://www.crowdstrike.com/sitemap_index.xml`
-
-```xml
-
-<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type="text/xsl" href="https://www.crowdstrike.com/wp-content/plugins/wordpress-seo/css/main-sitemap.xsl"?>
-<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-	<sitemap>
-		<loc>https://www.crowdstrike.com/post-sitemap.xml</loc>
-		<lastmod>2024-09-26T17:20:34+00:00</lastmod>
-	</sitemap>
-	<sitemap>
-		<loc>https://www.crowdstrike.com/post-sitemap2.xml</loc>
-		<lastmod>2024-09-26T17:20:34+00:00</lastmod>
-	</sitemap>
-	<sitemap>
-		<loc>https://www.crowdstrike.com/page-sitemap.xml</loc>
-		<lastmod>2024-10-02T17:51:56+00:00</lastmod>
-	</sitemap>
-	<sitemap>
-		<loc>https://www.crowdstrike.com/adversary-universe-sitemap.xml</loc>
-		<lastmod>2024-09-27T13:57:52+00:00</lastmod>
-	</sitemap>
-</sitemapindex>
-```
-
-In the case of a sitemap returned, go to step 4.
-
-If a sitemap index is returned the scripts crawls all `<loc>` urls to get the sitemap files.
-
-### Step 4: dedupe URLs
-
-Once all sitemap files have been identified from the robots.txt file, all `url.loc` and `url.lastmod` values are collected and stored.
-
-The script then removes any duplicate URL entries, keeping the entry with the lowest `url.lastmod` time in such scenarios.
-
-The list is further refined base on the `lastmod_min` time specified by the user in the command line. Here the script will remove all urls with a `lastmod` time less than that specified.
-
-### Step 5: get post title
-
-Finally the script should visit each URL to get the title of the post. This is a somewhat crude approach as it will grab the HTML `title`, which might not actually be exactly the same as the blog title.
-
-### Step 6: print final file
-
-At the last step a JSON file with `url`, `lastmod`, `title`, and `sitemap` (sitemaps url was originally found in) should be created as follows;
-
-```json
-    {
-        "url": "",
-        "lastmod": "",
-        "title": "",
-        "sitemap": ""
-    }
-```
-
-#### A note on errors
-
-In some cases sitemaps contain links that do not exist anymore (hit 404s). Occassionally the server might be down (500) or you're blocked from a page (i.e. to many requests).
-
-In these cases, the `title` will be marked as `Failed to Retrieve`. e.g.
-
-```json
-    {
-        "url": "https://www.crowdstrike.com/blog/author/vicky-ngo-lam-josh-grunzweig/",
-        "lastmod": "2024-07-10T01:06:58+00:00",
-        "title": "Failed to Retrieve",
-        "sitemap": "https://www.crowdstrike.com/author-sitemap.xml"
-    },
-```
-
-This is one reason to use the `remove_404_records` flag at script run-time.
+- [Awesome Threat Intel Blog list](https://github.com/muchdogesec/awesome_threat_intel_blogs).]
 
 ## Support
 
