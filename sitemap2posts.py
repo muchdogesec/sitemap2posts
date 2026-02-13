@@ -23,6 +23,7 @@ lastmod_default = datetime.now(timezone.utc)
 # Save the original default method
 JSONEncoder_olddefault = json.JSONEncoder.default
 
+
 # Define the new default method
 def JSONEncoder_newdefault(self, obj):
     if isinstance(obj, datetime):
@@ -32,8 +33,10 @@ def JSONEncoder_newdefault(self, obj):
     # Call the original method for other types
     return JSONEncoder_olddefault(self, obj)
 
+
 # Replace the default method with the new one
 json.JSONEncoder.default = JSONEncoder_newdefault
+
 
 def make_dt_utc(dt: datetime) -> datetime:
     """Convert a datetime to UTC if it is naive."""
@@ -97,9 +100,7 @@ def parse_sitemap_content(soup, sitemap_url):
             if lastmod:
                 lastmod = make_dt_utc(parse_dt(lastmod.text.strip()))
             if loc:
-                urls.append(
-                    (loc.text.strip(), lastmod)
-                )
+                urls.append((loc.text.strip(), lastmod))
         logging.info(f"Found {len(urls)} URL(s) in sitemap")
         return urls, False
 
@@ -179,7 +180,12 @@ def get_post_title(url, check_404=False):
         data["meta_description"] = article.meta_description.strip()
     if article.authors:
         data["authors"] = "; ".join(article.authors)
-    date = find_date(response.text, url=url, extensive_search=True, outputformat="%Y-%m-%dT%H:%M:%S%z")
+    date = find_date(
+        response.text,
+        url=url,
+        extensive_search=True,
+        outputformat="%Y-%m-%dT%H:%M:%S%z",
+    )
     if date:
         data["htmldate"] = make_dt_utc(datetime.fromisoformat(date))
 
@@ -203,6 +209,7 @@ def save_to_json(posts, output_filename="sitemap_posts.json"):
         logging.info(f"JSON saved successfully with {len(posts)} post(s)")
     except IOError as e:
         logging.error(f"Failed to save JSON to {output_filename}: {e}")
+
 
 def is_date_after_min(lastmod_parsed, lastmod_min):
     """Check if parsed date is after the minimum date."""
