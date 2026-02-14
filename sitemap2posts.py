@@ -113,8 +113,9 @@ def get_sitemap_urls(sitemap_url):
     logging.info(f"Fetching sitemap from {sitemap_url}")
     response = fetch_url(sitemap_url)
 
-    if not response or response.status_code != 200:
-        logging.error(f"Failed to fetch sitemap from {sitemap_url}: {response.reason}")
+    if not response or not response.ok:
+        reason = response.reason if response else "No response"
+        logging.error(f"Failed to fetch sitemap from {sitemap_url}: {reason}")
         return [], False
 
     soup = BeautifulSoup(response.content, "lxml-xml")
@@ -381,6 +382,7 @@ def sitemap2posts(
     remove_404_records=False,
 ):
     """Main function to crawl sitemaps and extract post information."""
+    lastmod_min = lastmod_min and make_dt_utc(lastmod_min)
 
     if not sitemap_urls:
         logging.info("Using sitemaps from robots.txt")
@@ -445,24 +447,30 @@ def parse_cli_arguments():
     )
     parser.add_argument(
         "--lastmod_min",
-        type=str,
+        type=datetime.fromisoformat,
+        default=None,
+        metavar="YYYY-MM-DD",
         help="Filter URLs with lastmod date on or after (YYYY-MM-DD)",
     )
     parser.add_argument(
         "--path_ignore_list",
         type=str,
         nargs="+",
+        default=[],
         help="Path patterns to ignore (supports glob patterns). Examples: /blog/author '*/tag/*' 'https://example.com/*/archive'",
     )
     parser.add_argument(
         "--path_allow_list",
         type=str,
         nargs="+",
+        default=[],
         help="Path patterns to allow (supports glob patterns). Only URLs matching these patterns will be included. Examples: /blog/post/* '*/2024/*'",
     )
     parser.add_argument(
         "--ignore_sitemaps",
         type=str,
+        nargs='+',
+        default=[],
         help="Comma-separated list of specific sitemap URLs to ignore",
     )
     parser.add_argument(
@@ -470,44 +478,21 @@ def parse_cli_arguments():
         action="store_true",
         help="Exclude URLs that return a 404 status code.",
     )
-    return parser.parse_args()
-
-
-def parse_date_argument(date_str):
-    """Parse date string to datetime object."""
-    try:
-        parsed_date = datetime.strptime(date_str, "%Y-%m-%d").replace(
-            tzinfo=timezone.utc
-        )
-        logging.info(f"lastmod_min parsed as {parsed_date} (UTC)")
-        return parsed_date
-    except ValueError:
-        logging.error("Invalid date format for --lastmod_min. Use YYYY-MM-DD.")
-        exit(1)
-
-
-def parse_comma_separated(value):
-    """Parse comma-separated string to list."""
-    return [item.strip() for item in value.split(",")] if value else []
-
+    args = parser.parse_args()
+    return args
 
 if __name__ == "__main__":
     args = parse_cli_arguments()
 
-    # Parse arguments
-    lastmod_min = parse_date_argument(args.lastmod_min) if args.lastmod_min else None
-    path_ignore_list = args.path_ignore_list if args.path_ignore_list else []
-    path_allow_list = args.path_allow_list if args.path_allow_list else []
-    ignore_sitemaps = parse_comma_separated(args.ignore_sitemaps)
 
     # Call the function with the URLs and other parameters from CLI input
     posts = sitemap2posts(
         args.blog_url,
         sitemap_urls=args.sitemap_urls,
-        lastmod_min=lastmod_min,
-        path_ignore_list=path_ignore_list,
-        path_allow_list=path_allow_list,
-        ignore_sitemaps=ignore_sitemaps,
+        lastmod_min=args.lastmod_min,
+        path_ignore_list=args.path_ignore_list,
+        path_allow_list=args.path_allow_list,
+        ignore_sitemaps=args.ignore_sitemaps,
         remove_404_records=args.remove_404_records,
     )
 
