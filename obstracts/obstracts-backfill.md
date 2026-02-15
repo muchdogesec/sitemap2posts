@@ -48,16 +48,6 @@ python3 sitemap2posts.py https://www.volexity.com/blog/ \
     --output obstracts/output/volexity_blog.json
 ```
 
-### esentire (`5cb0ff18-841e-5f46-8529-ca6f41e22d0b`)
-
-```shell
-python3 sitemap2posts.py https://www.esentire.com/blog/ \
-    --lastmod_min 2020-01-01 \
-    --sitemap_urls https://www.esentire.com/sitemaps-1-section-blog-1-sitemap-p1.xml https://www.esentire.com/sitemaps-1-section-blog-1-sitemap-p2.xml \
-    --remove_404_records \
-    --output obstracts/output/esentire_blog.json
-```
-
 ### ZScalar (`dcb31053-0a55-5fcd-ba0e-975cdae7dce8`)
 
 ```shell
@@ -155,6 +145,18 @@ python3 sitemap2posts.py https://arcticwolf.com/resources/blog/ \
 (occassional 403s)
 
 ---
+
+## Issues
+
+### esentire (`5cb0ff18-841e-5f46-8529-ca6f41e22d0b`)
+
+```shell
+python3 sitemap2posts.py https://www.esentire.com/blog/ \
+    --lastmod_min 2020-01-01 \
+    --sitemap_urls https://www.esentire.com/sitemaps-1-section-blog-1-sitemap-p1.xml https://www.esentire.com/sitemaps-1-section-blog-1-sitemap-p2.xml \
+    --remove_404_records \
+    --output obstracts/output/esentire_blog.json
+```
 
 ## Bad
 

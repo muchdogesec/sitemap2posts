@@ -13,6 +13,93 @@
             ],
             "omit_author": false,
             "preferred_date": "P"
-        }
+        },
+        {
+            "feed_id": "57f65a6f-fb84-5fd7-ba2b-6623322224fb",
+            "blog_url": "https://expel.com/blog/",
+            "sitemap_urls": [
+                "https://expel.com/post-sitemap.xml"
+            ],
+            "profile_id": "3d9af85e-dc3f-5ac8-951f-aa26ef74086a",
+            "remove_404_records": true,
+            "path_allow_list": [
+                "https://expel.com/blog/*"
+            ],
+            "omit_author": false,
+            "preferred_date": "P"
+        },
+        {
+            "feed_id": "98d67329-7040-5562-b5e6-876377cf6ae2",
+            "blog_url": "https://hunt.io/blog/",
+            "sitemap_urls": [
+                "https://hunt.io/sitemap.xml"
+            ],
+            "profile_id": "3d9af85e-dc3f-5ac8-951f-aa26ef74086a",
+            "remove_404_records": true,
+            "path_allow_list": [
+                "https://hunt.io/blog/*"
+            ],
+            "omit_author": true,
+            "preferred_date": "L"
+        },
+        {
+            "feed_id": "85818f22-92ff-5c68-8dc1-a9c6d6e505ec",
+            "blog_url": "https://www.volexity.com/blog/",
+            "sitemap_urls": [
+                "https://www.volexity.com/post-sitemap.xml"
+            ],
+            "profile_id": "3d9af85e-dc3f-5ac8-951f-aa26ef74086a",
+            "remove_404_records": true,
+            "path_allow_list": [
+                "https://www.volexity.com/blog/*"
+            ],
+            "omit_author": false,
+            "preferred_date": "P"
+        },
+        {
+            "feed_id": "dcb31053-0a55-5fcd-ba0e-975cdae7dce8",
+            "blog_url": "https://www.zscaler.com/blogs/security-research/",
+            "sitemap_urls": [
+                "https://www.zscaler.com/sitemap.xml"
+            ],
+            "profile_id": "3d9af85e-dc3f-5ac8-951f-aa26ef74086a",
+            "remove_404_records": true,
+            "path_allow_list": [
+                "https://www.zscaler.com/blogs/security-research/*"
+            ],
+            "omit_author": true,
+            "preferred_date": "H"
+        },
+        {
+            "feed_id": "39740aa2-052e-53ca-ad1e-32d10b79cc63",
+            "blog_url": "https://www.dragos.com/blog/",
+            "profile_id": "3d9af85e-dc3f-5ac8-951f-aa26ef74086a",
+            "remove_404_records": true,
+            "path_allow_list": [
+                "https://www.dragos.com/blog/*"
+            ],
+            "omit_author": false,
+            "preferred_date": "P"
+        },
+        {
+            "feed_id": "6a9b10fe-0158-502e-9ec2-79149fcf2ea1",
+            "blog_url": "https://binarydefense.com/resources/blog/",
+            "sitemap_urls": [
+                "https://binarydefense.com/sitemaps-1-section-resources-1-sitemap.xml"
+            ],
+            "profile_id": "3d9af85e-dc3f-5ac8-951f-aa26ef74086a",
+            "remove_404_records": true,
+            "path_allow_list": [
+                "https://binarydefense.com/resources/blog/*"
+            ],
+            "omit_author": true,
+            "preferred_date": "L"
+        },
+
+
+
     ]
 }
+
+
+
