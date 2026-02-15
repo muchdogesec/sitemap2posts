@@ -93,13 +93,79 @@
                 "https://binarydefense.com/resources/blog/*"
             ],
             "omit_author": true,
-            "preferred_date": "L"
+            "preferred_date": "H"
         },
-
-
-
+        {
+            "feed_id": "c069b35f-90a0-534e-a445-c54d97ad0068",
+            "blog_url": "https://zimperium.com/blog/",
+            "sitemap_urls": [
+                "https://zimperium.com/sitemap.xml"
+            ],
+            "profile_id": "3d9af85e-dc3f-5ac8-951f-aa26ef74086a",
+            "remove_404_records": true,
+            "path_allow_list": [
+                "https://zimperium.com/blog/*"
+            ],
+            "omit_author": true,
+            "preferred_date": "H"
+        },
+        {
+            "feed_id": "2f8fc4c3-551b-537c-8cfe-25f1ba89ffb1",
+            "blog_url": "https://www.cyera.com/research-labs/",
+            "sitemap_urls": [
+                "https://www.cyera.com/sitemap.xml"
+            ],
+            "profile_id": "3d9af85e-dc3f-5ac8-951f-aa26ef74086a",
+            "remove_404_records": true,
+            "path_allow_list": [
+                "https://www.cyera.com/research-labs/*"
+            ],
+            "omit_author": false,
+            "preferred_date": "H"
+        },
+        {
+            "feed_id": "4d944236-3671-5881-a3bd-ae37c766406f",
+            "blog_url": "https://securityscorecard.com/blog/",
+            "sitemap_urls": [
+                "https://securityscorecard.com/blog-sitemap.xml"
+            ],
+            "profile_id": "3d9af85e-dc3f-5ac8-951f-aa26ef74086a",
+            "remove_404_records": true,
+            "path_allow_list": [
+                "https://securityscorecard.com/blog/*"
+            ],
+            "omit_author": true,
+            "preferred_date": "H"
+        },
+        {
+            "feed_id": "d38238bc-d753-5f81-9c0f-6f31a22d7d70",
+            "blog_url": "https://www.aquasec.com/blog/",
+            "sitemap_urls": [
+                "https://www.aquasec.com/post-sitemap.xml"
+            ],
+            "profile_id": "3d9af85e-dc3f-5ac8-951f-aa26ef74086a",
+            "remove_404_records": true,
+            "path_allow_list": [
+                "https://www.aquasec.com/blog/*"
+            ],
+            "omit_author": false,
+            "preferred_date": "P"
+        },
+        {
+            "feed_id": "9102b220-4788-567a-bd30-8135d28fa43e",
+            "blog_url": "https://arcticwolf.com/resources/blog/",
+            "sitemap_urls": [
+                "https://arcticwolf.com/post-sitemap.xml",
+                "https://arcticwolf.com/post-sitemap2.xml",
+                "https://arcticwolf.com/post-sitemap3.xml "
+            ],
+            "profile_id": "3d9af85e-dc3f-5ac8-951f-aa26ef74086a",
+            "remove_404_records": true,
+            "path_allow_list": [
+                "https://www.aquasec.com/blog/*"
+            ],
+            "omit_author": false,
+            "preferred_date": "P"
+        }
     ]
 }
-
-
-
