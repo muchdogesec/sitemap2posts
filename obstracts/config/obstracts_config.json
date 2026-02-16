@@ -14,7 +14,7 @@
             "path_ignore_list": [
                 "https://specterops.io/blog/"
             ],
-            "omit_author": false,
+            "omit_author": true,
             "preferred_date": "P"
         },
         {
@@ -31,7 +31,7 @@
             "path_ignore_list": [
                 "https://expel.com/blog/"
             ],
-            "omit_author": false,
+            "omit_author": true,
             "preferred_date": "P"
         },
         {
@@ -65,7 +65,7 @@
             "path_ignore_list": [
                 "https://www.volexity.com/blog/"
             ],
-            "omit_author": false,
+            "omit_author": true,
             "preferred_date": "P"
         },
         {
@@ -96,7 +96,7 @@
             "path_ignore_list": [
                 "https://www.dragos.com/blog/"
             ],
-            "omit_author": false,
+            "omit_author": true,
             "preferred_date": "P"
         },
         {
@@ -181,7 +181,7 @@
             "path_ignore_list": [
                 "https://www.aquasec.com/blog/"
             ],
-            "omit_author": false,
+            "omit_author": true,
             "preferred_date": "P"
         },
         {
