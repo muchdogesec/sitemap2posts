@@ -13,6 +13,159 @@
             ],
             "omit_author": false,
             "preferred_date": "P"
+        },
+        {
+            "feed_id": "57f65a6f-fb84-5fd7-ba2b-6623322224fb",
+            "blog_url": "https://expel.com/blog/",
+            "sitemap_urls": [
+                "https://expel.com/post-sitemap.xml"
+            ],
+            "profile_id": "3d9af85e-dc3f-5ac8-951f-aa26ef74086a",
+            "remove_404_records": true,
+            "path_allow_list": [
+                "https://expel.com/blog/*"
+            ],
+            "omit_author": false,
+            "preferred_date": "P"
+        },
+        {
+            "feed_id": "98d67329-7040-5562-b5e6-876377cf6ae2",
+            "blog_url": "https://hunt.io/blog/",
+            "sitemap_urls": [
+                "https://hunt.io/sitemap.xml"
+            ],
+            "profile_id": "3d9af85e-dc3f-5ac8-951f-aa26ef74086a",
+            "remove_404_records": true,
+            "path_allow_list": [
+                "https://hunt.io/blog/*"
+            ],
+            "omit_author": true,
+            "preferred_date": "L"
+        },
+        {
+            "feed_id": "85818f22-92ff-5c68-8dc1-a9c6d6e505ec",
+            "blog_url": "https://www.volexity.com/blog/",
+            "sitemap_urls": [
+                "https://www.volexity.com/post-sitemap.xml"
+            ],
+            "profile_id": "3d9af85e-dc3f-5ac8-951f-aa26ef74086a",
+            "remove_404_records": true,
+            "path_allow_list": [
+                "https://www.volexity.com/blog/*"
+            ],
+            "omit_author": false,
+            "preferred_date": "P"
+        },
+        {
+            "feed_id": "dcb31053-0a55-5fcd-ba0e-975cdae7dce8",
+            "blog_url": "https://www.zscaler.com/blogs/security-research/",
+            "sitemap_urls": [
+                "https://www.zscaler.com/sitemap.xml"
+            ],
+            "profile_id": "3d9af85e-dc3f-5ac8-951f-aa26ef74086a",
+            "remove_404_records": true,
+            "path_allow_list": [
+                "https://www.zscaler.com/blogs/security-research/*"
+            ],
+            "omit_author": true,
+            "preferred_date": "H"
+        },
+        {
+            "feed_id": "39740aa2-052e-53ca-ad1e-32d10b79cc63",
+            "blog_url": "https://www.dragos.com/blog/",
+            "profile_id": "3d9af85e-dc3f-5ac8-951f-aa26ef74086a",
+            "remove_404_records": true,
+            "path_allow_list": [
+                "https://www.dragos.com/blog/*"
+            ],
+            "omit_author": false,
+            "preferred_date": "P"
+        },
+        {
+            "feed_id": "6a9b10fe-0158-502e-9ec2-79149fcf2ea1",
+            "blog_url": "https://binarydefense.com/resources/blog/",
+            "sitemap_urls": [
+                "https://binarydefense.com/sitemaps-1-section-resources-1-sitemap.xml"
+            ],
+            "profile_id": "3d9af85e-dc3f-5ac8-951f-aa26ef74086a",
+            "remove_404_records": true,
+            "path_allow_list": [
+                "https://binarydefense.com/resources/blog/*"
+            ],
+            "omit_author": true,
+            "preferred_date": "H"
+        },
+        {
+            "feed_id": "c069b35f-90a0-534e-a445-c54d97ad0068",
+            "blog_url": "https://zimperium.com/blog/",
+            "sitemap_urls": [
+                "https://zimperium.com/sitemap.xml"
+            ],
+            "profile_id": "3d9af85e-dc3f-5ac8-951f-aa26ef74086a",
+            "remove_404_records": true,
+            "path_allow_list": [
+                "https://zimperium.com/blog/*"
+            ],
+            "omit_author": true,
+            "preferred_date": "H"
+        },
+        {
+            "feed_id": "2f8fc4c3-551b-537c-8cfe-25f1ba89ffb1",
+            "blog_url": "https://www.cyera.com/research-labs/",
+            "sitemap_urls": [
+                "https://www.cyera.com/sitemap.xml"
+            ],
+            "profile_id": "3d9af85e-dc3f-5ac8-951f-aa26ef74086a",
+            "remove_404_records": true,
+            "path_allow_list": [
+                "https://www.cyera.com/research-labs/*"
+            ],
+            "omit_author": false,
+            "preferred_date": "H"
+        },
+        {
+            "feed_id": "4d944236-3671-5881-a3bd-ae37c766406f",
+            "blog_url": "https://securityscorecard.com/blog/",
+            "sitemap_urls": [
+                "https://securityscorecard.com/blog-sitemap.xml"
+            ],
+            "profile_id": "3d9af85e-dc3f-5ac8-951f-aa26ef74086a",
+            "remove_404_records": true,
+            "path_allow_list": [
+                "https://securityscorecard.com/blog/*"
+            ],
+            "omit_author": true,
+            "preferred_date": "H"
+        },
+        {
+            "feed_id": "d38238bc-d753-5f81-9c0f-6f31a22d7d70",
+            "blog_url": "https://www.aquasec.com/blog/",
+            "sitemap_urls": [
+                "https://www.aquasec.com/post-sitemap.xml"
+            ],
+            "profile_id": "3d9af85e-dc3f-5ac8-951f-aa26ef74086a",
+            "remove_404_records": true,
+            "path_allow_list": [
+                "https://www.aquasec.com/blog/*"
+            ],
+            "omit_author": false,
+            "preferred_date": "P"
+        },
+        {
+            "feed_id": "9102b220-4788-567a-bd30-8135d28fa43e",
+            "blog_url": "https://arcticwolf.com/resources/blog/",
+            "sitemap_urls": [
+                "https://arcticwolf.com/post-sitemap.xml",
+                "https://arcticwolf.com/post-sitemap2.xml",
+                "https://arcticwolf.com/post-sitemap3.xml "
+            ],
+            "profile_id": "3d9af85e-dc3f-5ac8-951f-aa26ef74086a",
+            "remove_404_records": true,
+            "path_allow_list": [
+                "https://www.aquasec.com/blog/*"
+            ],
+            "omit_author": false,
+            "preferred_date": "P"
         }
     ]
 }

@@ -48,16 +48,6 @@ python3 sitemap2posts.py https://www.volexity.com/blog/ \
     --output obstracts/output/volexity_blog.json
 ```
 
-### esentire (`5cb0ff18-841e-5f46-8529-ca6f41e22d0b`)
-
-```shell
-python3 sitemap2posts.py https://www.esentire.com/blog/ \
-    --lastmod_min 2020-01-01 \
-    --sitemap_urls https://www.esentire.com/sitemaps-1-section-blog-1-sitemap-p1.xml https://www.esentire.com/sitemaps-1-section-blog-1-sitemap-p2.xml \
-    --remove_404_records \
-    --output obstracts/output/esentire_blog.json
-```
-
 ### ZScalar (`dcb31053-0a55-5fcd-ba0e-975cdae7dce8`)
 
 ```shell
@@ -75,16 +65,6 @@ python3 sitemap2posts.py https://www.dragos.com/blog/ \
     --lastmod_min 2020-01-01 \
     --remove_404_records \
     --output obstracts/output/dragos_blog.json
-```
-
-### bitsight (`1abb8bff-c1e6-556e-b56a-7d20b47a9b06`)
-
-```shell
-python3 sitemap2posts.py https://www.bitsight.com/blog/ \
-    --lastmod_min 2020-01-01 \
-    --sitemap_urls https://www.bitsight.com/sitemaps/default/sitemap.xml \
-    --remove_404_records \
-    --output obstracts/output/bitsight_blog.json
 ```
 
 ### binary defense (`6a9b10fe-0158-502e-9ec2-79149fcf2ea1`)
@@ -107,7 +87,7 @@ python3 sitemap2posts.py https://zimperium.com/blog/ \
     --output obstracts/output/zimperium_blog.json
 ```
 
-### cyera
+### cyera (`2f8fc4c3-551b-537c-8cfe-25f1ba89ffb1`)
 
 ```shell
 python3 sitemap2posts.py https://www.cyera.com/research-labs \
@@ -155,6 +135,32 @@ python3 sitemap2posts.py https://arcticwolf.com/resources/blog/ \
 (occassional 403s)
 
 ---
+
+## Issues
+
+### esentire (`5cb0ff18-841e-5f46-8529-ca6f41e22d0b`)
+
+```shell
+python3 sitemap2posts.py https://www.esentire.com/blog/ \
+    --lastmod_min 2020-01-01 \
+    --sitemap_urls https://www.esentire.com/sitemaps-1-section-blog-1-sitemap-p1.xml https://www.esentire.com/sitemaps-1-section-blog-1-sitemap-p2.xml \
+    --remove_404_records \
+    --output obstracts/output/esentire_blog.json
+```
+
+error running scrip
+
+### bitsight (`1abb8bff-c1e6-556e-b56a-7d20b47a9b06`)
+
+```shell
+python3 sitemap2posts.py https://www.bitsight.com/blog/ \
+    --lastmod_min 2020-01-01 \
+    --sitemap_urls https://www.bitsight.com/sitemaps/default/sitemap.xml \
+    --remove_404_records \
+    --output obstracts/output/bitsight_blog.json
+```
+
+missing entries
 
 ## Bad
 
