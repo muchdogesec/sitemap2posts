@@ -277,12 +277,7 @@ def filter_urls_by_base(urls, base_url):
 
 
 def url_matches_pattern(url, pattern):
-    """Check if URL matches a pattern (supports both prefix and glob patterns)."""
-    # If pattern contains glob characters, use fnmatch
-    if "*" in pattern or "?" in pattern or "[" in pattern:
-        return fnmatch(url, pattern)
-    # Otherwise, use simple prefix matching
-    return url.startswith(pattern)
+    return fnmatch(url, pattern)
 
 
 def filter_urls_by_paths(urls, ignore_paths=None, allow_paths=None):
