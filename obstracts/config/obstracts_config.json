@@ -11,6 +11,9 @@
             "path_allow_list": [
                 "https://specterops.io/blog/*"
             ],
+            "path_ignore_list": [
+                "https://specterops.io/blog/"
+            ],
             "omit_author": false,
             "preferred_date": "P"
         },

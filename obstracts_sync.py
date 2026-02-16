@@ -116,6 +116,15 @@ class ObstractsAPIClient:
                 job, _failed_posts = self._submit_posts(feed_id, profile_id, posts)
                 if _failed_posts:
                     failed_posts.extend(_failed_posts)
+                if not posts:
+                    return {
+                        "feed_id": feed_id,
+                        "posts_count": len(orig_posts),
+                        "job_id": "none, all posts already added",
+                        "success": True,
+                        "submitted_posts": 0,
+                        "failed_posts": failed_posts,
+                    }
                 if job:
                     return {
                         "feed_id": feed_id,
@@ -123,6 +132,7 @@ class ObstractsAPIClient:
                         "job_id": job["id"],
                         "success": True,
                         "submitted_posts": len(posts),
+                        "failed_posts": failed_posts,
                     }
             except JobCreationFailed:
                 break
@@ -136,13 +146,12 @@ class ObstractsAPIClient:
             "job_id": None,
             "success": False,
             "error": "Failed to submit job",
+            "failed_posts": failed_posts,
         }
 
     def _submit_posts(
         self, feed_id: str, profile_id: Optional[str], posts: List[Dict]
     ) -> tuple[Optional[Dict], list[Dict]]:
-        if not posts:
-            return dict(id="none, empty posts", feed_id=feed_id, profile_id=profile_id)
         endpoint = f"{self.base_url}/v1/feeds/{feed_id}/posts/"
 
         # Prepare payload
