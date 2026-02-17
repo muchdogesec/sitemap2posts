@@ -28,6 +28,7 @@ DEFAULT_PREFERRED_DATE = (
     "LPHM"  # Default order: Lastmod, Publish_date, Htmldate, Modified_header
 )
 DEFAULT_OMIT_AUTHOR = False  # Default: include author information
+DEFAULT_USE_DATE_FILTER = True  # Default: filter posts by date
 
 
 class GitHubActionsOutput:
@@ -429,6 +430,16 @@ def process_feed(feed_config: Dict, api_client: ObstractsAPIClient) -> Dict:
             logging.info(f"Filtering posts from {lastmod_min}")
         except ValueError:
             logging.error(f"Invalid lastmod_min format: {lastmod_min}")
+    
+
+    # Get use_date_filter configuration (default to True)
+    use_date_filter = feed_config.get("use_date_filter", DEFAULT_USE_DATE_FILTER)
+    if not use_date_filter:
+        logging.info("Date filtering disabled for this feed")
+
+    if not (use_date_filter or (feed_config['preferred_date'] or '').startswith('L')):
+        # don't use lastmod if it's not the preferred date filter
+        lastmod_min_date = None
 
     # Fetch posts from sitemap
     posts = sitemap2posts(
@@ -460,13 +471,14 @@ def process_feed(feed_config: Dict, api_client: ObstractsAPIClient) -> Dict:
     # Get omit_author configuration (default to False)
     omit_author = feed_config.get("omit_author", DEFAULT_OMIT_AUTHOR)
 
+
     # Extract dates and filter posts by lastmod_min using the extracted date
     posts_with_dates = []
     for post in posts:
         extracted_date = extract_date_from_post(post, preferred_date)
 
-        # Apply lastmod_min filter using the extracted date
-        if lastmod_min_date and extracted_date:
+        # Apply lastmod_min filter using the extracted date (if enabled)
+        if use_date_filter and lastmod_min_date and extracted_date:
             if extracted_date < lastmod_min_date:
                 logging.debug(
                     f"Filtering out {post['url']}: {extracted_date.isoformat()} < {lastmod_min_date.isoformat()}"

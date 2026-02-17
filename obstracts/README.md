@@ -43,6 +43,7 @@ Create a JSON configuration file (e.g., `obstracts_config.json`) with your feed 
             "profile_id": "profile-uuid-here",
             "preferred_date": "LHPM",
             "omit_author": true,
+            "use_date_filter": false,
             "lastmod_min": "2024-01-01",
             "path_ignore_list": [
                 "/blog/author",
@@ -77,6 +78,7 @@ Each feed in the configuration supports the following options:
   - Example: `"LHPM"` tries lastmod first, falls back to htmldate, then publish_date, then modified_header
   - The extracted date is used both for `lastmod_min` filtering and as the `pubdate` in API requests
 - **omit_author** (optional, default: `false`): Whether to exclude author information from posts sent to the API
+- **use_date_filter** (optional, default: `true`): Whether to filter posts by date using `lastmod_min`. When set to `false`, all posts are included regardless of date
 - **lastmod_min** (optional): Filter posts with date on or after this date (YYYY-MM-DD format)
   - Should be retrieved from the Obstracts API server unless manually set
   - This value is removed from the config file after each run
