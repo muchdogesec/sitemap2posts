@@ -17,6 +17,7 @@
             ],
             "profile_id": "0bfbb57c-26b5-5182-9bb6-2dbc3419dcf4",
             "preferred_date": "LHPM",
+            "use_date_filter": false,
             "path_ignore_list": [
                 "/blog/author",
                 "*/tag/*",
