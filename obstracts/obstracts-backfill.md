@@ -160,7 +160,7 @@ python3 sitemap2posts.py https://www.bitsight.com/blog/ \
     --output obstracts/output/bitsight_blog.json
 ```
 
-missing entries
+After a few dozen requests, bitsight starts returning 429 making everything after fail so we get missing entries.
 
 ## Bad
 
