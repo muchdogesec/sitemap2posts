@@ -6,6 +6,39 @@ Bad = sitemap approach does not work
 
 ## Good (working well)
 
+## Sublime Security (`5782159d-3066-574c-8f3f-be1dd8288b65`)
+
+```shell
+python3 sitemap2posts.py https://sublime.security/blog/ \
+    --path_allow_list 'https://proxied2.sublime.security/blog/*' \
+    --lastmod_min 2020-01-01 \
+    --sitemap_urls https://sublime.security/sitemap.xml \
+    --remove_404_records \
+    --output obstracts/output/sublime_security_blog.json
+```
+
+## Iverify blog (`70dd1922-9678-5091-8ec8-22499dc4dbbf`)
+
+```shell
+python3 sitemap2posts.py https://iverify.io/blog/ \
+    --path_allow_list 'https://iverify.io/blog/*' \
+    --lastmod_min 2020-01-01 \
+    --sitemap_urls https://iverify.io/sitemap.xml \
+    --remove_404_records \
+    --output obstracts/output/iverify_blog.json
+```
+
+### Censys (`5bae04de-fe6e-513e-9a84-dae21a4b3734`)
+
+```shell
+python3 sitemap2posts.py https://censys.com/blog/ \
+    --path_allow_list 'https://censys.com/blog/*' \
+    --lastmod_min 2020-01-01 \
+    --sitemap_urls https://censys.com/post-sitemap.xml \
+    --remove_404_records \
+    --output obstracts/output/censys_blog.json
+```
+
 ### SpectorOps (`1ae489cf-f335-57a8-b96d-c87e1cd0eb78`)
 
 ```shell
