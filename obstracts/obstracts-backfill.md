@@ -20,7 +20,7 @@ python3 sitemap2posts.py https://www.halcyon.ai/blog/ \
 ## Sublime Security (`5782159d-3066-574c-8f3f-be1dd8288b65`)
 
 ```shell
-python3 sitemap2posts.py https://proxied2.sublime.security/blog/ \
+python3 sitemap2posts.py https://sublime.security/blog/ \
     --path_allow_list 'https://proxied2.sublime.security/blog/*' \
     --lastmod_min 2020-01-01 \
     --sitemap_urls https://sublime.security/sitemap.xml \
