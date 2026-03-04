@@ -6,6 +6,17 @@ Bad = sitemap approach does not work
 
 ## Good (working well)
 
+## Halcyon (`cfd04d80-e7f1-52c9-b6bf-3af60f5ff75c`)
+
+```shell
+python3 sitemap2posts.py https://www.halcyon.ai/blog/ \
+    --path_allow_list 'https://www.halcyon.ai/blog/*' \
+    --lastmod_min 2020-01-01 \
+    --sitemap_urls https://www.halcyon.ai/sitemap.xml \
+    --remove_404_records \
+    --output obstracts/output/halcyon_blog.json
+```
+
 ## Sublime Security (`5782159d-3066-574c-8f3f-be1dd8288b65`)
 
 ```shell
