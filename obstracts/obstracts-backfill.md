@@ -206,6 +206,18 @@ python3 sitemap2posts.py https://www.bitsight.com/blog/ \
 
 After a few dozen requests, bitsight starts returning 429 making everything after fail so we get missing entries.
 
+## Venture Beat
+
+```shell
+python3 sitemap2posts.py https://venturebeat.com/security/ \
+    --path_allow_list 'https://venturebeat.com/security/*' \
+    --lastmod_min 2020-01-01 \
+    --remove_404_records \
+    --output obstracts/output/venturebeat_blog.json
+```
+
+Too many requests errors.
+
 ## Bad
 
 ### Validin
