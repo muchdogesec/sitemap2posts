@@ -188,10 +188,15 @@ python3 sitemap2posts.py https://nohackie.com/ \
     --output obstracts/output/nohackie_blog.json
 ```
 
+### Reliaquest (`fe6671dc-af3a-5dc4-9f5a-ed09378bdd0c`)
 
-
-
-
+```shell
+python3 sitemap2posts.py https://reliaquest.com/blog/ \
+    --lastmod_min 2020-01-01 \
+    --sitemap_urls https://reliaquest.com/sitemap.xml  \
+    --remove_404_records \
+    --output obstracts/output/reliaquest_blog.json
+```
 
 ---
 
