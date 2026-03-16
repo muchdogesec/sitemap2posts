@@ -178,11 +178,46 @@ python3 sitemap2posts.py https://arcticwolf.com/resources/blog/ \
 
 (occassional 403s)
 
+### nohackie (`655a1dc3-45ed-51ed-a0ae-c1d68b894ae0`)
+
+```shell
+python3 sitemap2posts.py https://nohackie.com/ \
+    --lastmod_min 2020-01-01 \
+    --sitemap_urls https://nohackie.com/sitemap.xml  \
+    --remove_404_records \
+    --output obstracts/output/nohackie_blog.json
+```
+
+
+
+
+
+
 ---
 
 ## Issues
 
-### esentire (`5cb0ff18-841e-5f46-8529-ca6f41e22d0b`)
+### darknet
+
+```shell
+python3 sitemap2posts.py https://www.darknet.org.uk/ \
+    --lastmod_min 2020-01-01 \
+    --sitemap_urls https://www.darknet.org.uk/post-sitemap1.xml https://www.darknet.org.uk/post-sitemap2.xml https://www.darknet.org.uk/post-sitemap3.xml \
+    --remove_404_records \
+    --output obstracts/output/darknet_blog.json
+```
+
+### Blue Voyant
+
+```shell
+python3 sitemap2posts.py https://www.bluevoyant.com/blog/ \
+    --lastmod_min 2020-01-01 \
+    --sitemap_urls https://www.bluevoyant.com/sitemaps-1-section-blog-1-sitemap.xml  \
+    --remove_404_records \
+    --output obstracts/output/bluevoyant_blog.json
+```
+
+### esentire
 
 ```shell
 python3 sitemap2posts.py https://www.esentire.com/blog/ \
@@ -194,7 +229,7 @@ python3 sitemap2posts.py https://www.esentire.com/blog/ \
 
 error running scrip
 
-### bitsight (`1abb8bff-c1e6-556e-b56a-7d20b47a9b06`)
+### bitsight
 
 ```shell
 python3 sitemap2posts.py https://www.bitsight.com/blog/ \

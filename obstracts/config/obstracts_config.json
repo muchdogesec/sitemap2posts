@@ -270,6 +270,20 @@
             ],
             "omit_author": true,
             "preferred_date": "H"
+        },
+        {
+            "feed_id": "655a1dc3-45ed-51ed-a0ae-c1d68b894ae0",
+            "blog_url": "https://nohackie.com/",
+            "sitemap_urls": [
+                "https://nohackie.com/sitemap.xml"
+            ],
+            "profile_id": "a8c00d89-b71e-51b7-84a6-fec3c5bdf7f6",
+            "remove_404_records": true,
+            "path_allow_list": [
+                "https://nohackie.com/*"
+            ],
+            "omit_author": true,
+            "preferred_date": "H"
         }
     ]
 }
