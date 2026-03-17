@@ -202,7 +202,42 @@ python3 sitemap2posts.py https://reliaquest.com/blog/ \
 
 ## Issues
 
-### darknet
+### Security Ledger (`6169e9ce-e0e8-5651-b87f-8a068ddf58e9`)
+
+https://github.com/muchdogesec/sitemap2posts/issues/31
+
+```shell
+python3 sitemap2posts.py https://securityledger.com/ \
+    --lastmod_min 2020-01-01 \
+    --sitemap_urls https://securityledger.com/sitemap-1.xml https://securityledger.com/sitemap-2.xml https://securityledger.com/sitemap-3.xml \
+    --remove_404_records \
+    --output obstracts/output/securityledger_blog.json
+```
+```json
+        {
+            "feed_id": "6169e9ce-e0e8-5651-b87f-8a068ddf58e9",
+            "blog_url": "https://securityledger.com/",
+            "sitemap_urls": [
+                "https://securityledger.com/post-sitemap.xml",
+                "https://securityledger.com/post-sitemap2.xml",
+                "https://securityledger.com/post-sitemap3.xml"
+            ],
+            "profile_id": "a8c00d89-b71e-51b7-84a6-fec3c5bdf7f6",
+            "remove_404_records": true,
+            "path_allow_list": [
+                "https://securityledger.com/*"
+            ],
+            "path_ignore_list": [
+                "https://securityledger.com/"
+            ],
+            "omit_author": ,
+            "preferred_date": ""
+        },
+```
+
+### darknet (`6570f61e-62d2-5ee9-a8ec-f417200f5dc0`)
+
+https://github.com/muchdogesec/sitemap2posts/issues/31
 
 ```shell
 python3 sitemap2posts.py https://www.darknet.org.uk/ \
@@ -211,6 +246,30 @@ python3 sitemap2posts.py https://www.darknet.org.uk/ \
     --remove_404_records \
     --output obstracts/output/darknet_blog.json
 ```
+
+```json
+        {
+            "feed_id": "6570f61e-62d2-5ee9-a8ec-f417200f5dc0",
+            "blog_url": "https://www.darknet.org.uk/",
+            "sitemap_urls": [
+                "https://www.darknet.org.uk/post-sitemap1.xml",
+                "https://www.darknet.org.uk/post-sitemap2.xml",
+                "https://www.darknet.org.uk/post-sitemap3.xml"
+            ],
+            "profile_id": "a8c00d89-b71e-51b7-84a6-fec3c5bdf7f6",
+            "remove_404_records": true,
+            "path_allow_list": [
+                "https://www.darknet.org.uk/*"
+            ],
+            "path_ignore_list": [
+                "https://www.darknet.org.uk/"
+            ],
+            "omit_author": ,
+            "preferred_date": ""
+        },
+```
+
+
 
 ### Blue Voyant
 
