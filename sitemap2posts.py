@@ -68,7 +68,7 @@ def get_sitemaps_from_robots(url):
     robots_url = urljoin(url, "/robots.txt")
     response = fetch_url(robots_url)
 
-    if not response or response.status_code != 200:
+    if not response or not response.ok:
         logging.error(f"Failed to fetch robots.txt from {robots_url}")
         return []
 
@@ -114,7 +114,7 @@ def get_sitemap_urls(sitemap_url):
     response = fetch_url(sitemap_url)
 
     if not response or not response.ok:
-        reason = response.reason if response else "No response"
+        reason = response.reason if response is not None else "No response"
         logging.error(f"Failed to fetch sitemap from {sitemap_url}: {reason}")
         return [], False
 
@@ -197,7 +197,7 @@ def get_post_title(url, check_404=False):
 def save_to_json(posts, output_filename="sitemap_posts.json"):
     for post in posts:
         if post["lastmod"] is None:
-            post["lastmod"] = lastmod_default.isoformat()
+            post["lastmod"] = lastmod_default
 
     # Sort posts by sitemap first, and then by lastmod (newest first)
     sorted_posts = sorted(
@@ -464,7 +464,7 @@ def parse_cli_arguments():
     parser.add_argument(
         "--ignore_sitemaps",
         type=str,
-        nargs='+',
+        nargs="+",
         default=[],
         help="Comma-separated list of specific sitemap URLs to ignore",
     )
@@ -478,7 +478,6 @@ def parse_cli_arguments():
 
 if __name__ == "__main__":
     args = parse_cli_arguments()
-
 
     # Call the function with the URLs and other parameters from CLI input
     posts = sitemap2posts(
