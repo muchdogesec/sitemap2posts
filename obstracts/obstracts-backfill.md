@@ -198,6 +198,37 @@ python3 sitemap2posts.py https://reliaquest.com/blog/ \
     --output obstracts/output/reliaquest_blog.json
 ```
 
+### Bushido Token (`11287bc4-bdf7-5700-a278-efa2cdc85b9d`)
+
+```shell
+python3 sitemap2posts.py https://blog.bushidotoken.net/ \
+    --lastmod_min 2020-01-01 \
+    --sitemap_urls https://blog.bushidotoken.net/sitemap.xml \
+    --remove_404_records \
+    --output obstracts/output/bushidotoken_blog.json
+```
+
+
+
+
+        {
+            "feed_id": "11287bc4-bdf7-5700-a278-efa2cdc85b9d",
+            "blog_url": "https://blog.bushidotoken.net/",
+            "sitemap_urls": [
+                "https://blog.bushidotoken.net/sitemap.xml"
+            ],
+            "profile_id": "a8c00d89-b71e-51b7-84a6-fec3c5bdf7f6",
+            "remove_404_records": true,
+            "path_allow_list": [
+                "https://blog.bushidotoken.net/*"
+            ],
+            "path_ignore_list": [
+                "https://blog.bushidotoken.net/"
+            ],
+            "omit_author": ,
+            "preferred_date": ""
+        },
+
 ---
 
 ## Issues
