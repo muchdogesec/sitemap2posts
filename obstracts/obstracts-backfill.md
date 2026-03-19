@@ -255,6 +255,16 @@ python3 sitemap2posts.py https://claroty.com/team82/research/ \
     --output obstracts/output/claroty_blog.json
 ```
 
+### Fox IT (`c35efdcf-b291-5ae3-b5f4-8034517b9d61`)
+
+```shell
+python3 sitemap2posts.py https://blog.fox-it.com/ \
+    --lastmod_min 2020-01-01 \
+    --sitemap_urls https://blog.fox-it.com/sitemap.xml \
+    --remove_404_records \
+    --output obstracts/output/foxit_blog.json
+```
+
 ---
 
 ## Issues
