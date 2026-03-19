@@ -339,6 +339,23 @@
             ],
             "omit_author": false,
             "preferred_date": "H"
+        },
+        {
+            "feed_id": "c35efdcf-b291-5ae3-b5f4-8034517b9d61",
+            "blog_url": "https://blog.fox-it.com/",
+            "sitemap_urls": [
+                "https://blog.fox-it.com/sitemap.xml"
+            ],
+            "profile_id": "a8c00d89-b71e-51b7-84a6-fec3c5bdf7f6",
+            "remove_404_records": true,
+            "path_allow_list": [
+                "https://blog.fox-it.com/*"
+            ],
+            "path_ignore_list": [
+                "https://blog.fox-it.com/"
+            ],
+            "omit_author": false,
+            "preferred_date": "H"
         }
     ]
 }
