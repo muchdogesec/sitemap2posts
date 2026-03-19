@@ -198,41 +198,6 @@ python3 sitemap2posts.py https://reliaquest.com/blog/ \
     --output obstracts/output/reliaquest_blog.json
 ```
 
-### Bushido Token (`11287bc4-bdf7-5700-a278-efa2cdc85b9d`)
-
-```shell
-python3 sitemap2posts.py https://blog.bushidotoken.net/ \
-    --lastmod_min 2020-01-01 \
-    --sitemap_urls https://blog.bushidotoken.net/sitemap.xml \
-    --remove_404_records \
-    --output obstracts/output/bushidotoken_blog.json
-```
-
-
-
-
-        {
-            "feed_id": "11287bc4-bdf7-5700-a278-efa2cdc85b9d",
-            "blog_url": "https://blog.bushidotoken.net/",
-            "sitemap_urls": [
-                "https://blog.bushidotoken.net/sitemap.xml"
-            ],
-            "profile_id": "a8c00d89-b71e-51b7-84a6-fec3c5bdf7f6",
-            "remove_404_records": true,
-            "path_allow_list": [
-                "https://blog.bushidotoken.net/*"
-            ],
-            "path_ignore_list": [
-                "https://blog.bushidotoken.net/"
-            ],
-            "omit_author": ,
-            "preferred_date": ""
-        },
-
----
-
-## Issues
-
 ### Security Ledger (`6169e9ce-e0e8-5651-b87f-8a068ddf58e9`)
 
 https://github.com/muchdogesec/sitemap2posts/issues/31
@@ -243,27 +208,6 @@ python3 sitemap2posts.py https://securityledger.com/ \
     --sitemap_urls https://securityledger.com/sitemap-1.xml https://securityledger.com/sitemap-2.xml https://securityledger.com/sitemap-3.xml \
     --remove_404_records \
     --output obstracts/output/securityledger_blog.json
-```
-```json
-        {
-            "feed_id": "6169e9ce-e0e8-5651-b87f-8a068ddf58e9",
-            "blog_url": "https://securityledger.com/",
-            "sitemap_urls": [
-                "https://securityledger.com/post-sitemap.xml",
-                "https://securityledger.com/post-sitemap2.xml",
-                "https://securityledger.com/post-sitemap3.xml"
-            ],
-            "profile_id": "a8c00d89-b71e-51b7-84a6-fec3c5bdf7f6",
-            "remove_404_records": true,
-            "path_allow_list": [
-                "https://securityledger.com/*"
-            ],
-            "path_ignore_list": [
-                "https://securityledger.com/"
-            ],
-            "omit_author": ,
-            "preferred_date": ""
-        },
 ```
 
 ### darknet (`6570f61e-62d2-5ee9-a8ec-f417200f5dc0`)
@@ -278,29 +222,42 @@ python3 sitemap2posts.py https://www.darknet.org.uk/ \
     --output obstracts/output/darknet_blog.json
 ```
 
-```json
-        {
-            "feed_id": "6570f61e-62d2-5ee9-a8ec-f417200f5dc0",
-            "blog_url": "https://www.darknet.org.uk/",
-            "sitemap_urls": [
-                "https://www.darknet.org.uk/post-sitemap1.xml",
-                "https://www.darknet.org.uk/post-sitemap2.xml",
-                "https://www.darknet.org.uk/post-sitemap3.xml"
-            ],
-            "profile_id": "a8c00d89-b71e-51b7-84a6-fec3c5bdf7f6",
-            "remove_404_records": true,
-            "path_allow_list": [
-                "https://www.darknet.org.uk/*"
-            ],
-            "path_ignore_list": [
-                "https://www.darknet.org.uk/"
-            ],
-            "omit_author": ,
-            "preferred_date": ""
-        },
+### Bushido Token (`11287bc4-bdf7-5700-a278-efa2cdc85b9d`)
+
+```shell
+python3 sitemap2posts.py https://blog.bushidotoken.net/ \
+    --lastmod_min 2020-01-01 \
+    --sitemap_urls https://blog.bushidotoken.net/sitemap.xml \
+    --remove_404_records \
+    --output obstracts/output/bushidotoken_blog.json
 ```
 
+https://github.com/muchdogesec/history4feed/issues/212
 
+
+### Trusted Sec (`2426fd19-0848-58fe-abbd-11e325191761`)
+
+```shell
+python3 sitemap2posts.py https://trustedsec.com/blog/ \
+    --lastmod_min 2020-01-01 \
+    --sitemap_urls https://trustedsec.com/sitemaps-1-section-blog-1-sitemap-p1.xml https://trustedsec.com/sitemaps-1-section-blog-1-sitemap-p2.xml \
+    --remove_404_records \
+    --output obstracts/output/trustedsec_blog.json
+```
+
+### Claroty Team 82 (`0e212062-1a0a-5652-919a-8d201d00ad04`)
+
+```shell
+python3 sitemap2posts.py https://claroty.com/team82/research/ \
+    --lastmod_min 2020-01-01 \
+    --sitemap_urls https://claroty.com/sitemap.xml \
+    --remove_404_records \
+    --output obstracts/output/claroty_blog.json
+```
+
+---
+
+## Issues
 
 ### Blue Voyant
 
@@ -370,7 +327,7 @@ python3 sitemap2posts.py https://www.team-cymru.com/blog \
     --output obstracts/output/team-cymru_blog.json
 ```
 
-Sitemap is bad.
+Sitemap is bad (titles)
 
 ### inteleye
 
