@@ -1,0 +1,18 @@
+{
+    "feed_id": "5bae04de-fe6e-513e-9a84-dae21a4b3734",
+    "blog_url": "https://censys.com/blog/",
+    "sitemap_urls": [
+        "https://censys.com/post-sitemap.xml"
+    ],
+    "profile_id": "a8c00d89-b71e-51b7-84a6-fec3c5bdf7f6",
+    "remove_404_records": true,
+    "path_allow_list": [
+        "https://censys.com/blog/*"
+    ],
+    "path_ignore_list": [
+        "https://censys.com/blog/"
+    ],
+    "omit_author": true,
+    "preferred_date": "P",
+    "name": "Censys"
+}

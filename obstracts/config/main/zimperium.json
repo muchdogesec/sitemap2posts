@@ -1,0 +1,18 @@
+{
+    "feed_id": "c069b35f-90a0-534e-a445-c54d97ad0068",
+    "blog_url": "https://zimperium.com/blog/",
+    "sitemap_urls": [
+        "https://zimperium.com/sitemap.xml"
+    ],
+    "profile_id": "a8c00d89-b71e-51b7-84a6-fec3c5bdf7f6",
+    "remove_404_records": true,
+    "path_allow_list": [
+        "https://zimperium.com/blog/*"
+    ],
+    "path_ignore_list": [
+        "https://zimperium.com/blog/"
+    ],
+    "omit_author": true,
+    "preferred_date": "H",
+    "name": "Zimperium"
+}

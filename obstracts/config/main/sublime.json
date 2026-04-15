@@ -1,0 +1,18 @@
+{
+    "feed_id": "5782159d-3066-574c-8f3f-be1dd8288b65",
+    "blog_url": "https://proxied2.sublime.security/blog/",
+    "sitemap_urls": [
+        "https://sublime.security/sitemap.xml"
+    ],
+    "profile_id": "a8c00d89-b71e-51b7-84a6-fec3c5bdf7f6",
+    "remove_404_records": true,
+    "path_allow_list": [
+        "https://proxied2.sublime.security/blog/*"
+    ],
+    "path_ignore_list": [
+        "https://proxied2.sublime.security/blog/"
+    ],
+    "omit_author": true,
+    "preferred_date": "H",
+    "name": "Sublime"
+}

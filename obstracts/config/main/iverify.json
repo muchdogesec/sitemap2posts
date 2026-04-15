@@ -1,0 +1,18 @@
+{
+    "feed_id": "70dd1922-9678-5091-8ec8-22499dc4dbbf",
+    "blog_url": "https://iverify.io/blog/",
+    "sitemap_urls": [
+        "https://iverify.io/sitemap.xml"
+    ],
+    "profile_id": "a8c00d89-b71e-51b7-84a6-fec3c5bdf7f6",
+    "remove_404_records": true,
+    "path_allow_list": [
+        "https://iverify.io/blog/*"
+    ],
+    "path_ignore_list": [
+        "https://iverify.io/blog/"
+    ],
+    "omit_author": true,
+    "preferred_date": "M",
+    "name": "iVerify"
+}
