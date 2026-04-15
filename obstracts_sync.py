@@ -697,11 +697,11 @@ def sync_feeds(config_path: str, posts_per_job: Optional[int] = None):
         
         # Table header
         if result["success"]:
-            gh_output.add_summary("| Batch | Job ID | State | Posts | Submitted |\n")
-            gh_output.add_summary("|-------|--------|-------|-------|-----------|\n")
+            gh_output.add_summary("| Batch | Job ID | State | Posts | Submitted |")
+            gh_output.add_summary("|-------|--------|-------|-------|-----------|")
         else:
-            gh_output.add_summary("| Batch | Job ID | State | Posts | Submitted | Error |\n")
-            gh_output.add_summary("|-------|--------|-------|-------|-----------|-------|\n")
+            gh_output.add_summary("| Batch | Job ID | State | Posts | Submitted | Error |")
+            gh_output.add_summary("|-------|--------|-------|-------|-----------|-------|")
         
         # Table rows
         for job in jobs:
@@ -724,12 +724,12 @@ def sync_feeds(config_path: str, posts_per_job: Optional[int] = None):
             # Build row with or without error column
             if result["success"]:
                 gh_output.add_summary(
-                    f"| {batch} | `{job_id}` | {state_display} | {posts_in_batch} | {submitted} |\n"
+                    f"| {batch} | `{job_id}` | {state_display} | {posts_in_batch} | {submitted} |"
                 )
             else:
                 error = job.get("error", "")
                 gh_output.add_summary(
-                    f"| {batch} | `{job_id}` | {state_display} | {posts_in_batch} | {submitted} | {error} |\n"
+                    f"| {batch} | `{job_id}` | {state_display} | {posts_in_batch} | {submitted} | {error} |"
                 )
     
     gh_output.add_summary("\n")
