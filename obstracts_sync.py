@@ -95,7 +95,9 @@ class ObstractsAPIClient:
             }
         )
 
-    def wait_for_job(self, job_id: str, poll_interval: int = 5, timeout: int = 300) -> Dict:
+    def wait_for_job(
+        self, job_id: str, poll_interval: int = 5, timeout: int = 300
+    ) -> Dict:
         """
         Wait for a job to complete by polling its status.
 
@@ -109,9 +111,9 @@ class ObstractsAPIClient:
         """
         endpoint = f"{self.base_url}/v1/jobs/{job_id}/"
         start_time = time.time()
-        
+
         logging.info(f"Waiting for job {job_id} to complete...")
-        
+
         while True:
             elapsed = time.time() - start_time
             if elapsed > timeout:
@@ -119,20 +121,20 @@ class ObstractsAPIClient:
                 return {
                     "id": job_id,
                     "state": "timeout",
-                    "error": f"Job polling timed out after {timeout} seconds"
+                    "error": f"Job polling timed out after {timeout} seconds",
                 }
-            
+
             try:
                 response = self.session.get(endpoint)
                 if response.ok:
                     job_data = response.json()
                     state = job_data.get("state")
                     logging.debug(f"Job {job_id} state: {state}")
-                    
+
                     if state in ["processed", "failed"]:
                         logging.info(f"Job {job_id} completed with state: {state}")
                         return job_data
-                    
+
                     # Job is still processing
                     time.sleep(poll_interval)
                 else:
@@ -146,7 +148,11 @@ class ObstractsAPIClient:
                 time.sleep(poll_interval)
 
     def create_posts_bulk(
-        self, feed_id: str, profile_id: Optional[str], orig_posts: List[Dict], posts_per_job: Optional[int] = None
+        self,
+        feed_id: str,
+        profile_id: Optional[str],
+        orig_posts: List[Dict],
+        posts_per_job: Optional[int] = None,
     ) -> Dict:
         """
         Create multiple posts in a feed using bulk requests with optional batching.
@@ -162,7 +168,7 @@ class ObstractsAPIClient:
         """
         posts = orig_posts.copy()
         total_posts = len(posts)
-        
+
         # Determine batching
         if posts_per_job and posts_per_job > 0:
             logging.info(
@@ -173,66 +179,76 @@ class ObstractsAPIClient:
                 f"Processing {total_posts} posts for feed {feed_id} in a single batch"
             )
             posts_per_job = total_posts
-        
+
         # Split posts into batches
         batches = []
         for i in range(0, total_posts, posts_per_job):
-            batches.append(posts[i:i + posts_per_job])
-        
+            batches.append(posts[i : i + posts_per_job])
+
         all_jobs = []
         all_failed_posts = []
         total_submitted = 0
         batch_num = 0
-        
+
         for batch in batches:
             batch_num += 1
-            logging.info(f"Processing batch {batch_num}/{len(batches)} with {len(batch)} posts")
-            
+            logging.info(
+                f"Processing batch {batch_num}/{len(batches)} with {len(batch)} posts"
+            )
+
             failed_posts = []
             job = None
             batch_posts = batch.copy()
-            
+
             # Try to submit the batch (with retries)
             for retry in range(3):
                 if retry:
                     logging.info(f"Retry sending posts, {retry}/2 retries")
                 try:
-                    job, _failed_posts = self._submit_posts(feed_id, profile_id, batch_posts)
+                    job, _failed_posts = self._submit_posts(
+                        feed_id, profile_id, batch_posts
+                    )
                     if _failed_posts:
                         failed_posts.extend(_failed_posts)
                         all_failed_posts.extend(_failed_posts)
-                    
+
                     if not batch_posts:
                         # All posts already added
                         logging.info(f"Batch {batch_num}: All posts already exist")
-                        all_jobs.append({
-                            "batch": batch_num,
-                            "job_id": "none, all posts already added",
-                            "state": "skipped",
-                            "posts_in_batch": len(batch),
-                            "submitted": 0,
-                        })
+                        all_jobs.append(
+                            {
+                                "batch": batch_num,
+                                "job_id": "none, all posts already added",
+                                "state": "skipped",
+                                "posts_in_batch": len(batch),
+                                "submitted": 0,
+                            }
+                        )
                         break
-                    
+
                     if job:
                         job_id = job["id"]
-                        logging.info(f"Batch {batch_num}: Job {job_id} created, waiting for completion...")
-                        
+                        logging.info(
+                            f"Batch {batch_num}: Job {job_id} created, waiting for completion..."
+                        )
+
                         # Wait for this job to complete
                         completed_job = self.wait_for_job(job_id)
-                        
-                        all_jobs.append({
-                            "batch": batch_num,
-                            "job_id": job_id,
-                            "state": completed_job.get("state", "unknown"),
-                            "posts_in_batch": len(batch),
-                            "submitted": len(batch_posts),
-                            "error": completed_job.get("error"),
-                        })
-                        
+
+                        all_jobs.append(
+                            {
+                                "batch": batch_num,
+                                "job_id": job_id,
+                                "state": completed_job.get("state", "unknown"),
+                                "posts_in_batch": len(batch),
+                                "submitted": len(batch_posts),
+                                "error": completed_job.get("error"),
+                            }
+                        )
+
                         total_submitted += len(batch_posts)
                         break
-                        
+
                 except JobCreationFailed:
                     logging.error(f"Batch {batch_num}: Job creation failed")
                     break
@@ -242,18 +258,20 @@ class ObstractsAPIClient:
                     continue
             else:
                 # All retries failed
-                all_jobs.append({
-                    "batch": batch_num,
-                    "job_id": None,
-                    "state": "failed",
-                    "posts_in_batch": len(batch),
-                    "submitted": 0,
-                    "error": "Failed to submit job after retries",
-                })
-        
+                all_jobs.append(
+                    {
+                        "batch": batch_num,
+                        "job_id": None,
+                        "state": "failed",
+                        "posts_in_batch": len(batch),
+                        "submitted": 0,
+                        "error": "Failed to submit job after retries",
+                    }
+                )
+
         # Determine overall success
         success = all(job.get("state") in ["processed", "skipped"] for job in all_jobs)
-        
+
         return {
             "feed_id": feed_id,
             "posts_count": total_posts,
@@ -383,7 +401,9 @@ def validate_config(config: Dict) -> bool:
         logging.error("Missing required field 'profile_id'")
         return False
 
-    logging.info(f"Configuration validated successfully for feed: {config.get('feed_id')}")
+    logging.info(
+        f"Configuration validated successfully for feed: {config.get('feed_id')}"
+    )
     return True
 
 
@@ -466,7 +486,11 @@ def prepare_post_data(post: Dict, omit_author: bool) -> Dict:
     return data
 
 
-def process_feed(feed_config: Dict, api_client: ObstractsAPIClient, posts_per_job: Optional[int] = None) -> Dict:
+def process_feed(
+    feed_config: Dict,
+    api_client: ObstractsAPIClient,
+    posts_per_job: Optional[int] = None,
+) -> Dict:
     """
     Process a single feed configuration.
 
@@ -540,14 +564,13 @@ def process_feed(feed_config: Dict, api_client: ObstractsAPIClient, posts_per_jo
             logging.info(f"Filtering posts from {lastmod_min}")
         except ValueError:
             logging.error(f"Invalid lastmod_min format: {lastmod_min}")
-    
 
     # Get use_date_filter configuration (default to True)
     use_date_filter = feed_config.get("use_date_filter", DEFAULT_USE_DATE_FILTER)
     if not use_date_filter:
         logging.info("Date filtering disabled for this feed")
 
-    if not (use_date_filter or (feed_config['preferred_date'] or '').startswith('L')):
+    if not (use_date_filter or (feed_config["preferred_date"] or "").startswith("L")):
         # don't use lastmod if it's not the preferred date filter
         lastmod_min_date = None
 
@@ -580,7 +603,6 @@ def process_feed(feed_config: Dict, api_client: ObstractsAPIClient, posts_per_jo
 
     # Get omit_author configuration (default to False)
     omit_author = feed_config.get("omit_author", DEFAULT_OMIT_AUTHOR)
-
 
     # Extract dates and filter posts by lastmod_min using the extracted date
     posts_with_dates = []
@@ -662,8 +684,9 @@ def sync_feeds(config_path: str, posts_per_job: Optional[int] = None):
     feed_id = feed_config.get("feed_id")
     logging.info(f"Processing feed: {feed_id}")
 
+    feed_name = feed_config.get("name", os.path.basename(config_path))
     # Add GitHub Actions summary header
-    gh_output.add_summary("# 🔄 Obstracts Feed Sync Report\n")
+    gh_output.add_summary(f"# 🔄 Feed Sync Report: {feed_name}\n")
     gh_output.add_summary(
         f"**Sync Time:** {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}\n"
     )
@@ -681,28 +704,34 @@ def sync_feeds(config_path: str, posts_per_job: Optional[int] = None):
     gh_output.add_summary(f"\n## {status_icon} Feed: `{result['feed_id']}`\n\n")
     gh_output.add_summary(f"- **Posts Found:** {result['posts_count']}\n")
     gh_output.add_summary(f"- **Posts Submitted:** {submitted_posts}\n")
-    
+
     # Show error message if failed
     if not result["success"] and result.get("error"):
         gh_output.add_summary(f"- **Error:** {result.get('error')}\n")
-    
+
     # Show informational message if present
     if result.get("message"):
         gh_output.add_summary(f"- **Message:** {result['message']}\n")
-    
+
     # Show job details in a table
     jobs = result.get("jobs", [])
     if jobs:
-        gh_output.add_summary("\n")  # Blank line before table for proper markdown rendering
-        
+        gh_output.add_summary(
+            "\n"
+        )  # Blank line before table for proper markdown rendering
+
         # Table header
         if result["success"]:
             gh_output.add_summary("| Batch | Job ID | State | Posts | Submitted |")
             gh_output.add_summary("|-------|--------|-------|-------|-----------|")
         else:
-            gh_output.add_summary("| Batch | Job ID | State | Posts | Submitted | Error |")
-            gh_output.add_summary("|-------|--------|-------|-------|-----------|-------|")
-        
+            gh_output.add_summary(
+                "| Batch | Job ID | State | Posts | Submitted | Error |"
+            )
+            gh_output.add_summary(
+                "|-------|--------|-------|-------|-----------|-------|"
+            )
+
         # Table rows
         for job in jobs:
             job_id = job.get("job_id", "N/A")
@@ -710,7 +739,7 @@ def sync_feeds(config_path: str, posts_per_job: Optional[int] = None):
             posts_in_batch = job.get("posts_in_batch", 0)
             submitted = job.get("submitted", 0)
             batch = job.get("batch", "?")
-            
+
             # Add emoji based on state
             if state == "processed":
                 state_display = "✅ processed"
@@ -720,7 +749,7 @@ def sync_feeds(config_path: str, posts_per_job: Optional[int] = None):
                 state_display = "⏭️ skipped"
             else:
                 state_display = state
-            
+
             # Build row with or without error column
             if result["success"]:
                 gh_output.add_summary(
@@ -731,7 +760,7 @@ def sync_feeds(config_path: str, posts_per_job: Optional[int] = None):
                 gh_output.add_summary(
                     f"| {batch} | `{job_id}` | {state_display} | {posts_in_batch} | {submitted} | {error} |"
                 )
-    
+
     gh_output.add_summary("\n")
 
     # Clean up: Remove lastmod_min from config (it should be retrieved from server)
@@ -745,7 +774,9 @@ def sync_feeds(config_path: str, posts_per_job: Optional[int] = None):
     gh_output.add_summary("## 📊 Summary\n")
     gh_output.add_summary(f"- **Posts Fetched:** {total_posts}\n")
     gh_output.add_summary(f"- **Posts Submitted:** {submitted_posts}\n")
-    gh_output.add_summary(f"- **Status:** {'✅ Success' if result['success'] else '❌ Failed'}\n")
+    gh_output.add_summary(
+        f"- **Status:** {'✅ Success' if result['success'] else '❌ Failed'}\n"
+    )
 
     # Set GitHub Actions outputs
     gh_output.set_output("posts_found", str(total_posts))
@@ -791,7 +822,11 @@ multiple feeds in parallel.
         """,
     )
 
-    parser.add_argument("config", type=str, help="Path to the feed configuration JSON file (single feed)")
+    parser.add_argument(
+        "config",
+        type=str,
+        help="Path to the feed configuration JSON file (single feed)",
+    )
 
     parser.add_argument(
         "--verbose",
@@ -799,7 +834,7 @@ multiple feeds in parallel.
         action="store_true",
         help="Enable verbose logging (DEBUG level)",
     )
-    
+
     parser.add_argument(
         "--posts-per-job",
         type=int,

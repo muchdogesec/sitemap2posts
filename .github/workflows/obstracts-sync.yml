@@ -55,7 +55,7 @@ jobs:
   sync-feeds:
     runs-on: ubuntu-latest
     environment: "github-action"
-    name: Sync Feeds for ``${{ matrix.name }}``
+    name: Sync Feeds for `${{ matrix.name }}`
     needs: discover-feeds
     strategy:
       max-parallel: 2
@@ -81,5 +81,6 @@ jobs:
         env:
           OBSTRACTS_API_BASE_URL: ${{ secrets.OBSTRACTS_API_BASE_URL }}
           OBSTRACTS_API_KEY: ${{ secrets.OBSTRACTS_API_KEY }}
+          POSTS_PER_JOB: 64
         run: |
-          python obstracts_sync.py ${{ matrix.config_path }} --posts-per-job 5
+          python obstracts_sync.py ${{ matrix.config_path }} --posts-per-job $POSTS_PER_JOB
