@@ -60,7 +60,11 @@ jobs:
     name: Sync Feeds for ``${{ matrix.name }}``
     needs: discover-feeds
     strategy:
+      max-parallel: 2
       matrix: ${{ fromJson(needs.discover-feeds.outputs.matrix) }}
+    concurrency:
+      group: ${{ matrix.config_path }}
+      cancel-in-progress: true
 
     steps:
       - name: Checkout repository
