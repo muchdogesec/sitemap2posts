@@ -4,11 +4,14 @@ This tool synchronizes blog posts from sitemaps to Obstracts feeds using the Obs
 
 ## Features
 
-- **Bulk Post Creation**: Sends all posts for a feed in a single API request
-- **Async Job Processing**: Submits jobs without waiting for completion
+- **Individual Feed Configs**: Each feed has its own JSON configuration file
+- **Organized by Category**: Configs organized in directories (`main/`, `issues/`, `examples/`)
+- **Feed Discovery**: Automatic discovery of feed configs with filtering support
+- **Batch Processing**: Configurable `posts_per_job` parameter for batch uploads
+- **Job Completion Tracking**: Waits for jobs to complete with status monitoring
+- **GitHub Actions Matrix Strategy**: Parallel processing of multiple feeds
 - **GitHub Actions Support**: Automatic job summaries and outputs
 - **Automatic Config Updates**: Updates `lastmod_min` after each successful sync
-- **Multiple Feed Support**: Process multiple feeds in a single run
 
 ## Setup
 
@@ -21,55 +24,59 @@ export OBSTRACTS_API_BASE_URL="<OBSTRACTS WEB TOKEN>"
 export OBSTRACTS_API_KEY="<YOUR OBSTRACTS WEB TOKEN>"
 ```
 
-### Configuration File
+### Configuration Files
 
-Create a JSON configuration file (e.g., `obstracts_config.json`) with your feed configurations:
+Feed configurations are stored as individual JSON files organized by category:
+
+```
+obstracts/config/
+├── single_feed.example.json  # Example template
+├── main/                     # Production feeds
+│   ├── specterops.json
+│   ├── expel.json
+│   └── ...
+├── issues/                   # Feeds with known issues
+│   ├── darknet.json
+│   └── securityledger.json
+└── examples/                 # Example configurations
+    ├── crowdstrike.json
+    └── krebsonsecurity.json
+```
+
+Each configuration file represents a single feed. Example `specterops.json`:
 
 ```json
 {
-    "feeds": [
-        {
-            "feed_id": "example-feed-id-1",
-            "blog_url": "https://www.crowdstrike.com/blog/",
-            "profile_id": "profile-uuid-here",
-            "lastmod_min": "2024-01-01"
-        },
-        {
-            "feed_id": "example-feed-id-2",
-            "blog_url": "https://krebsonsecurity.com/",
-            "sitemap_urls": [
-                "https://krebsonsecurity.com/post-sitemap.xml"
-            ],
-            "profile_id": "profile-uuid-here",
-            "preferred_date": "LHPM",
-            "omit_author": true,
-            "use_date_filter": false,
-            "lastmod_min": "2024-01-01",
-            "path_ignore_list": [
-                "/blog/author",
-                "*/tag/*",
-                "*/archive"
-            ],
-            "path_allow_list": [
-                "/blog/*",
-                "*/2024/*"
-            ],
-            "remove_404_records": true
-        }
-    ]
+    "feed_id": "1ae489cf-f335-57a8-b96d-c87e1cd0eb78",
+    "blog_url": "https://specterops.io/blog/",
+    "sitemap_urls": [
+        "https://specterops.io/post-sitemap.xml"
+    ],
+    "profile_id": "a8c00d89-b71e-51b7-84a6-fec3c5bdf7f6",
+    "remove_404_records": true,
+    "path_allow_list": [
+        "https://specterops.io/blog/*"
+    ],
+    "path_ignore_list": [
+        "https://specterops.io/blog/"
+    ],
+    "omit_author": true,
+    "preferred_date": "P",
+    "name": "SpecterOps"
 }
 ```
 
 ## Configuration Options
 
-Each feed in the configuration supports the following options:
+Each feed configuration file supports the following options:
 
 - **feed_id** (required): The Obstracts feed ID to post to
 - **blog_url** (required): Blog URL to extract posts from
+- **profile_id** (required): Profile UUID to associate with posts
+- **name** (optional): Human-readable feed name (defaults to filename stem)
 - **sitemap_urls** (optional): Array of sitemap URLs to crawl directly
   - If provided, automatically uses sitemap_urls mode
   - If omitted, uses robots mode (discovers sitemaps from robots.txt)
-- **profile_id** (required): Profile UUID to associate with posts
 - **preferred_date** (optional, default: `"LPHM"`): Order of date sources to try for post publication date. Each character represents a date source:
   - `L` = lastmod (from sitemap `<lastmod>` tag)
   - `H` = htmldate (extracted from HTML content using htmldate library)
@@ -93,41 +100,78 @@ Each feed in the configuration supports the following options:
 
 ### Basic Usage
 
+Process a single feed:
+
 ```bash
-python obstracts_sync.py obstracts_config.json
+python obstracts_sync.py obstracts/config/main/specterops.json --posts-per-job 64
 ```
 
 ### Options
 
+- `CONFIG_FILE` (positional, required): Path to a single feed configuration JSON file
+- `--posts-per-job` (required): Maximum number of posts to submit per job
 - `--verbose` or `-v`: Enable verbose logging (DEBUG level)
+
+### Feed Discovery
+
+Use `discover_feeds.py` to find and filter feed configurations:
+
+```bash
+# List all feeds in main category
+python obstracts/discover_feeds.py --include main --list
+
+# Show feeds as markdown table
+python obstracts/discover_feeds.py --markdown
+
+# Generate GitHub Actions matrix (default: main and issues)
+python obstracts/discover_feeds.py
+
+# Filter specific feeds by filename stem
+python obstracts/discover_feeds.py --filter specterops expel
+
+# Generate matrix for specific categories
+python obstracts/discover_feeds.py --include main
+```
 
 ### Examples
 
 ```bash
-# Normal sync
-python obstracts_sync.py obstracts_config.json
+# Process a single feed
+python obstracts_sync.py obstracts/config/main/specterops.json --posts-per-job 64
 
-# Verbose logging
-python obstracts_sync.py obstracts_config.json --verbose
+# Process with verbose logging
+python obstracts_sync.py obstracts/config/main/expel.json --posts-per-job 64 --verbose
+
+# Process with larger batch size
+python obstracts_sync.py obstracts/config/main/hunt.json --posts-per-job 128
+
+# Discover all main feeds
+python obstracts/discover_feeds.py --include main --list
+
+# Filter and show specific feeds
+python obstracts/discover_feeds.py --filter specterops expel --markdown
 ```
 
 ## How It Works
 
-1. Reads the configuration file with feed definitions
-2. For each feed:
-   - Fetches posts from sitemaps using the specified mode
-   - Filters posts based on `lastmod_min` date (if provided, should be retrieved from Obstracts API)
-   - Sends a **single bulk POST request** with all posts to the Obstracts API
-   - Receives a job ID and continues to the next feed (does not wait for job completion)
-3. Removes `lastmod_min` from the configuration (should be retrieved from server for next run)
-4. Saves the cleaned configuration back to the file
-5. Outputs summary statistics and GitHub Actions summary (if running in GitHub Actions)
+1. Reads a single feed configuration file
+2. Fetches posts from sitemaps using the specified mode
+3. Filters posts based on `lastmod_min` date (if provided, should be retrieved from Obstracts API)
+4. Splits posts into batches based on `--posts-per-job` parameter
+5. For each batch:
+   - Sends a bulk POST request with all posts in the batch to the Obstracts API
+   - Receives a job ID
+   - Waits for the job to complete with automatic polling
+   - Reports job status (processed/failed)
+6. Removes `lastmod_min` from the configuration (should be retrieved from server for next run)
+7. Saves the cleaned configuration back to the file
+8. Outputs summary statistics and GitHub Actions summary (if running in GitHub Actions)
 
 ## API Details
 
-### Bulk Post Creation
+### Bulk Post Creation with Batching
 
-Posts are created using a single bulk request:
+Posts are created using bulk requests with batching controlled by the required `--posts-per-job` parameter:
 
 ```
 POST {OBSTRACTS_API_BASE_URL}/v1/feeds/{feed_id}/posts/
@@ -158,58 +202,122 @@ Response:
 }
 ```
 
-The tool submits all posts in a single request and receives a job ID. It does **not** wait for the job to complete before moving to the next feed.
+### Job Status Polling
+
+After submitting each batch, the tool polls the job status endpoint:
+
+```
+GET {OBSTRACTS_API_BASE_URL}/v1/jobs/{job_id}/
+```
+
+Response:
+```json
+{
+  "id": "job-uuid-here",
+  "state": "processed",  // or "pending", "processing", "failed"
+  "error": null
+}
+```
+
+The tool waits for each batch's job to complete (state: `processed` or `failed`) before proceeding to the next batch. This ensures:
+- Better error tracking and reporting
+- Controlled resource usage
+- Sequential processing with status visibility
 
 ## GitHub Actions Integration
 
-The tool automatically detects when running in GitHub Actions and provides:
+The tool automatically detects when running in GitHub Actions and provides enhanced reporting.
+
+### Workflow Architecture
+
+The workflow uses a two-job strategy:
+
+1. **discover-feeds**: Dynamically discovers feed configurations using `discover_feeds.py`
+2. **sync-feeds**: Matrix strategy that runs one job per feed in parallel
+
+### Workflow Features
+
+- **Manual Trigger with Filters**: Optionally filter specific feeds by name
+- **Category Selection**: Choose which categories to include (`main`, `issues`, etc.)
+- **Parallel Processing**: Runs multiple feeds concurrently (configurable with `max-parallel`)
+- **Batch Control**: Configurable `POSTS_PER_JOB` environment variable
+- **Per-Feed Summaries**: Each matrix job generates its own summary
 
 ### Job Summary
 
 A formatted markdown summary displayed in the Actions run, including:
+- Feed name and ID
 - Sync timestamp
-- Status for each feed (✅/❌)
-- Number of posts submitted per feed
-- Job IDs for tracking
-- Overall statistics
+- Number of posts found and submitted
+- Batch-by-batch status table with job IDs
+- Overall success/failure status
 
-### Outputs
+### Workflow Inputs
 
-The following outputs are available for use in subsequent workflow steps:
+Manual trigger supports these inputs:
 
-- `total_posts`: Total number of posts submitted across all feeds
-- `successful_feeds`: Number of feeds that succeeded
-- `failed_feeds`: Number of feeds that failed
-- `total_feeds`: Total number of feeds processed
+- **filter**: Space-separated feed stems to process (e.g., `"specterops expel"`)
+- **include**: Space-separated categories to include (default: `"main"`)
+
+### Example Matrix Output
+
+The `discover-feeds` job generates a matrix like:
+
+```json
+{
+  "include": [
+    {
+      "config_path": "obstracts/config/main/specterops.json",
+      "name": "SpecterOps",
+      "feed_id": "1ae489cf-f335-57a8-b96d-c87e1cd0eb78",
+      "category": "main"
+    },
+    {
+      "config_path": "obstracts/config/main/expel.json",
+      "name": "Expel",
+      "feed_id": "57f65a6f-fb84-5fd7-ba2b-6623322224fb",
+      "category": "main"
+    }
+  ]
+}
+```
 
 ### Example Workflow
 
-See `.github/workflows/obstracts-sync.yml` for a complete example that:
-- Runs on a schedule (daily at 8 AM)
-- Can be triggered manually
-- Installs dependencies
-- Runs the sync
+See `.github/workflows/obstracts-sync.yml` for the complete workflow that:
+- Runs on a schedule (daily at 8 AM UTC)
+- Supports manual triggers with filtering
+- Dynamically discovers feeds
+- Processes feeds in parallel using matrix strategy
+- Limits to 2 concurrent jobs with `max-parallel: 2`
+- Uses `POSTS_PER_JOB: 64` for batch processing
 
-**Note:** The config file is not committed back to the repository since `lastmod_min` should be retrieved from the Obstracts API server for each run.
+**Note:** Config files are not committed back since `lastmod_min` should be retrieved from the Obstracts API server for each run.
 
 ## Scheduling
 
 ### With Cron
 
+For processing individual feeds:
+
 ```bash
-# Run every day at 8 AM
-0 8 * * * cd /path/to/sitemap2posts && /path/to/python obstracts_sync.py obstracts_config.json
+# Process a specific feed every day at 8 AM
+0 8 * * * cd /path/to/sitemap2posts && /path/to/python obstracts_sync.py obstracts/config/main/specterops.json --posts-per-job 64
 ```
 
-### With GitHub Actions
+For processing all feeds, create a wrapper script that iterates through configs.
 
-See the workflow example above. GitHub Actions is recommended as it provides:
-- Job summaries with detailed status
-- Automatic config updates committed back to the repo
+### With GitHub Actions (Recommended)
+
+GitHub Actions is recommended for multiple feeds as it provides:
+- Parallel processing via matrix strategy
+- Per-feed job summaries with detailed status
+- Automatic feed discovery and filtering
 - Built-in scheduling and manual triggers
 - Secure secrets management
+- Batch processing control with `POSTS_PER_JOB`
 
 ## Exit Codes
 
-- `0`: All feeds processed successfully
-- `1`: One or more feeds failed, or configuration/environment error
+- `0`: Feed processed successfully (all batches completed)
+- `1`: Feed failed, or configuration/environment error
