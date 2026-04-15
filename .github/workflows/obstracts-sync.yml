@@ -4,12 +4,63 @@ on:
   schedule:
     # Run every day at 8 AM UTC
     - cron: "0 8 * * *"
-  workflow_dispatch: # Allow manual trigger
+  workflow_dispatch:
+    inputs:
+      filter:
+        description: 'Filter specific feeds (space-separated stems, e.g., "specterops expel")'
+        required: false
+        type: string
+      include:
+        description: 'Include categories (space-separated, e.g., "main issues")'
+        required: false
+        default: 'main'
+        type: string
 
 jobs:
+  # Job to dynamically discover all feed configs
+  discover-feeds:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Discover feed configs
+        id: set-matrix
+        run: |
+          # Build command with optional filters
+          CMD="python obstracts/discover_feeds.py"
+
+          INCLUDE="main"
+          
+          # Add category filter if specified
+          if [ -n "${{ inputs.include }}" ]; then
+            INCLUDE="${{ inputs.include }}"
+          fi
+
+          CMD="$CMD --include $INCLUDE"
+          
+          # Add feed filter if specified
+          if [ -n "${{ inputs.filter }}" ]; then
+            CMD="$CMD --filter ${{ inputs.filter }}"
+          fi
+          
+          # Generate matrix
+          MATRIX=$($CMD)
+          echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
+          
+          # Show discovered feeds
+          echo "Discovered feeds:" | tee $GITHUB_STEP_SUMMARY
+          $CMD --list | tee -a $GITHUB_STEP_SUMMARY
+
+
   sync-feeds:
     runs-on: ubuntu-latest
     environment: "github-action"
+    name: Sync Feeds for ``${{ matrix.name }}``
+    needs: discover-feeds
+    strategy:
+      matrix: ${{ fromJson(needs.discover-feeds.outputs.matrix) }}
 
     steps:
       - name: Checkout repository
@@ -29,4 +80,4 @@ jobs:
           OBSTRACTS_API_BASE_URL: ${{ secrets.OBSTRACTS_API_BASE_URL }}
           OBSTRACTS_API_KEY: ${{ secrets.OBSTRACTS_API_KEY }}
         run: |
-          python obstracts_sync.py obstracts/config/obstracts_config.json
+          python obstracts_sync.py ${{ matrix.config_path }} --posts-per-job 256

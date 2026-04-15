@@ -1,0 +1,18 @@
+{
+    "feed_id": "98d67329-7040-5562-b5e6-876377cf6ae2",
+    "blog_url": "https://hunt.io/blog/",
+    "sitemap_urls": [
+        "https://hunt.io/sitemap.xml"
+    ],
+    "profile_id": "a8c00d89-b71e-51b7-84a6-fec3c5bdf7f6",
+    "remove_404_records": true,
+    "path_allow_list": [
+        "https://hunt.io/blog/*"
+    ],
+    "path_ignore_list": [
+        "https://hunt.io/blog/"
+    ],
+    "omit_author": true,
+    "preferred_date": "L",
+    "name": "Hunt"
+}

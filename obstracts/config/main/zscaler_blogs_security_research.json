@@ -1,0 +1,18 @@
+{
+    "feed_id": "dcb31053-0a55-5fcd-ba0e-975cdae7dce8",
+    "blog_url": "https://www.zscaler.com/blogs/security-research/",
+    "sitemap_urls": [
+        "https://www.zscaler.com/sitemap.xml"
+    ],
+    "profile_id": "a8c00d89-b71e-51b7-84a6-fec3c5bdf7f6",
+    "remove_404_records": true,
+    "path_allow_list": [
+        "https://www.zscaler.com/blogs/security-research/*"
+    ],
+    "path_ignore_list": [
+        "https://www.zscaler.com/blogs/security-research/"
+    ],
+    "omit_author": true,
+    "preferred_date": "H",
+    "name": "Zscaler - Blogs Security-Research"
+}

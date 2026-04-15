@@ -1,0 +1,18 @@
+{
+    "feed_id": "4d944236-3671-5881-a3bd-ae37c766406f",
+    "blog_url": "https://securityscorecard.com/blog/",
+    "sitemap_urls": [
+        "https://securityscorecard.com/blog-sitemap.xml"
+    ],
+    "profile_id": "a8c00d89-b71e-51b7-84a6-fec3c5bdf7f6",
+    "remove_404_records": true,
+    "path_allow_list": [
+        "https://securityscorecard.com/blog/*"
+    ],
+    "path_ignore_list": [
+        "https://securityscorecard.com/blog/"
+    ],
+    "omit_author": true,
+    "preferred_date": "H",
+    "name": "SecurityScorecard"
+}

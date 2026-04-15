@@ -1,0 +1,18 @@
+{
+    "feed_id": "cfd04d80-e7f1-52c9-b6bf-3af60f5ff75c",
+    "blog_url": "https://www.halcyon.ai/blog/",
+    "sitemap_urls": [
+        "https://www.halcyon.ai/sitemap.xml"
+    ],
+    "profile_id": "a8c00d89-b71e-51b7-84a6-fec3c5bdf7f6",
+    "remove_404_records": true,
+    "path_allow_list": [
+        "https://www.halcyon.ai/blog/*"
+    ],
+    "path_ignore_list": [
+        "https://www.halcyon.ai/blog/"
+    ],
+    "omit_author": true,
+    "preferred_date": "H",
+    "name": "Halcyon"
+}

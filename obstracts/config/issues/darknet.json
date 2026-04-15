@@ -1,0 +1,20 @@
+{
+    "feed_id": "6570f61e-62d2-5ee9-a8ec-f417200f5dc0",
+    "blog_url": "https://www.darknet.org.uk/",
+    "sitemap_urls": [
+        "https://www.darknet.org.uk/post-sitemap1.xml",
+        "https://www.darknet.org.uk/post-sitemap2.xml",
+        "https://www.darknet.org.uk/post-sitemap3.xml"
+    ],
+    "profile_id": "a8c00d89-b71e-51b7-84a6-fec3c5bdf7f6",
+    "remove_404_records": true,
+    "path_allow_list": [
+        "https://www.darknet.org.uk/*"
+    ],
+    "path_ignore_list": [
+        "https://www.darknet.org.uk/"
+    ],
+    "omit_author": false,
+    "preferred_date": "P",
+    "name": "Darknet"
+}

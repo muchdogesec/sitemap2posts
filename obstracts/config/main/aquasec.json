@@ -1,0 +1,18 @@
+{
+    "feed_id": "d38238bc-d753-5f81-9c0f-6f31a22d7d70",
+    "blog_url": "https://www.aquasec.com/blog/",
+    "sitemap_urls": [
+        "https://www.aquasec.com/post-sitemap.xml"
+    ],
+    "profile_id": "a8c00d89-b71e-51b7-84a6-fec3c5bdf7f6",
+    "remove_404_records": true,
+    "path_allow_list": [
+        "https://www.aquasec.com/blog/*"
+    ],
+    "path_ignore_list": [
+        "https://www.aquasec.com/blog/"
+    ],
+    "omit_author": true,
+    "preferred_date": "P",
+    "name": "Aqua Security"
+}
