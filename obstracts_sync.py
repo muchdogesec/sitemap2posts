@@ -676,70 +676,63 @@ def sync_feeds(config_path: str, posts_per_job: Optional[int] = None):
     total_posts = result["posts_count"]
     submitted_posts = result.get("submitted_posts", 0)
 
-    if result["success"]:
-        # Add to GitHub Actions summary
-        status_icon = "✅"
-        gh_output.add_summary(f"## {status_icon} Feed: `{result['feed_id']}`\n")
-        gh_output.add_summary(f"- **Posts Found:** {result['posts_count']}\n")
-        gh_output.add_summary(f"- **Posts Submitted:** {result.get('submitted_posts', 0)}\n")
+    # Add to GitHub Actions summary
+    status_icon = "✅" if result["success"] else "❌"
+    gh_output.add_summary(f"\n## {status_icon} Feed: `{result['feed_id']}`\n\n")
+    gh_output.add_summary(f"- **Posts Found:** {result['posts_count']}\n")
+    gh_output.add_summary(f"- **Posts Submitted:** {submitted_posts}\n")
+    
+    # Show error message if failed
+    if not result["success"] and result.get("error"):
+        gh_output.add_summary(f"- **Error:** {result.get('error')}\n")
+    
+    # Show informational message if present
+    if result.get("message"):
+        gh_output.add_summary(f"- **Message:** {result['message']}\n")
+    
+    # Show job details in a table
+    jobs = result.get("jobs", [])
+    if jobs:
+        gh_output.add_summary("\n")  # Blank line before table for proper markdown rendering
         
-        # Show job details in a table
-        jobs = result.get("jobs", [])
-        if jobs:
-            gh_output.add_summary("\n| Batch | Job ID | State | Posts | Submitted |\n")
+        # Table header
+        if result["success"]:
+            gh_output.add_summary("| Batch | Job ID | State | Posts | Submitted |\n")
             gh_output.add_summary("|-------|--------|-------|-------|-----------|\n")
-            for job in jobs:
-                job_id = job.get("job_id", "N/A")
-                state = job.get("state", "unknown")
-                posts_in_batch = job.get("posts_in_batch", 0)
-                submitted = job.get("submitted", 0)
-                batch = job.get("batch", "?")
-                
-                # Add emoji based on state
-                if state == "processed":
-                    state_display = "✅ processed"
-                elif state == "failed":
-                    state_display = "❌ failed"
-                elif state == "skipped":
-                    state_display = "⏭️ skipped"
-                else:
-                    state_display = state
-                
+        else:
+            gh_output.add_summary("| Batch | Job ID | State | Posts | Submitted | Error |\n")
+            gh_output.add_summary("|-------|--------|-------|-------|-----------|-------|\n")
+        
+        # Table rows
+        for job in jobs:
+            job_id = job.get("job_id", "N/A")
+            state = job.get("state", "unknown")
+            posts_in_batch = job.get("posts_in_batch", 0)
+            submitted = job.get("submitted", 0)
+            batch = job.get("batch", "?")
+            
+            # Add emoji based on state
+            if state == "processed":
+                state_display = "✅ processed"
+            elif state == "failed":
+                state_display = "❌ failed"
+            elif state == "skipped":
+                state_display = "⏭️ skipped"
+            else:
+                state_display = state
+            
+            # Build row with or without error column
+            if result["success"]:
                 gh_output.add_summary(
                     f"| {batch} | `{job_id}` | {state_display} | {posts_in_batch} | {submitted} |\n"
                 )
-            gh_output.add_summary("\n")
-        
-        if result.get("message"):
-            gh_output.add_summary(f"- **Message:** {result['message']}\n")
-        gh_output.add_summary("\n")
-    else:
-        status_icon = "❌"
-        gh_output.add_summary(f"## {status_icon} Feed: `{result['feed_id']}`\n")
-        gh_output.add_summary(f"- **Status:** Failed\n")
-        
-        # Show job details even for failed feeds
-        jobs = result.get("jobs", [])
-        if jobs:
-            gh_output.add_summary("\n| Batch | Job ID | State | Posts | Submitted | Error |\n")
-            gh_output.add_summary("|-------|--------|-------|-------|-----------|-------|\n")
-            for job in jobs:
-                job_id = job.get("job_id", "N/A")
-                state = job.get("state", "unknown")
-                posts_in_batch = job.get("posts_in_batch", 0)
-                submitted = job.get("submitted", 0)
-                batch = job.get("batch", "?")
+            else:
                 error = job.get("error", "")
-                
                 gh_output.add_summary(
-                    f"| {batch} | `{job_id}` | ❌ {state} | {posts_in_batch} | {submitted} | {error} |\n"
+                    f"| {batch} | `{job_id}` | {state_display} | {posts_in_batch} | {submitted} | {error} |\n"
                 )
-            gh_output.add_summary("\n")
-        
-        gh_output.add_summary(
-            f"- **Error:** {result.get('error', 'Unknown error')}\n"
-        )
-        gh_output.add_summary("\n")
+    
+    gh_output.add_summary("\n")
 
     # Clean up: Remove lastmod_min from config (it should be retrieved from server)
     feed_config.pop("lastmod_min", None)

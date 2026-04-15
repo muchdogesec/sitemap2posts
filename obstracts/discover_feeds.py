@@ -151,6 +151,12 @@ Examples:
   # Combine filters and categories
   python discover_feeds.py --include main --filter specterops
 
+  # List feeds (plain text)
+  python discover_feeds.py --list
+
+  # List feeds (markdown table)
+  python discover_feeds.py --markdown
+
   # Set GitHub output
   python discover_feeds.py --github-output
 
@@ -204,6 +210,12 @@ Examples:
         help="List all discovered feeds with details",
     )
 
+    parser.add_argument(
+        "--markdown",
+        action="store_true",
+        help="Output discovered feeds in markdown format",
+    )
+
     args = parser.parse_args()
 
     # Discover feeds
@@ -229,6 +241,21 @@ Examples:
             print(f"     URL: {feed['blog_url']}")
             print(f"     Category: {feed['category']}")
             print()
+        return
+
+    # Markdown mode
+    if args.markdown:
+        print(f"# Discovered Feeds ({len(feeds)})\n")
+        print("| Name | Feed ID | URL | Category | Config Path |")
+        print("|------|---------|-----|----------|-------------|")
+        for feed in feeds:
+            # Escape pipe characters in fields
+            name = feed['name'].replace('|', '\\|')
+            feed_id_short = feed['feed_id'] if feed['feed_id'] else 'N/A'
+            url = feed['blog_url'].replace('|', '\\|')
+            category = feed['category']
+            config_path = feed['config_path'].replace('|', '\\|')
+            print(f"| {name} | `{feed_id_short}` | {url} | {category} | `{config_path}` |")
         return
 
     # Generate matrix

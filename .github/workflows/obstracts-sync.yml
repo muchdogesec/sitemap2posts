@@ -49,9 +49,7 @@ jobs:
           MATRIX=$($CMD)
           echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
           
-          # Show discovered feeds
-          echo "Discovered feeds:" | tee $GITHUB_STEP_SUMMARY
-          $CMD --list | tee -a $GITHUB_STEP_SUMMARY
+          $CMD --markdown > $GITHUB_STEP_SUMMARY
 
 
   sync-feeds:
@@ -84,4 +82,4 @@ jobs:
           OBSTRACTS_API_BASE_URL: ${{ secrets.OBSTRACTS_API_BASE_URL }}
           OBSTRACTS_API_KEY: ${{ secrets.OBSTRACTS_API_KEY }}
         run: |
-          python obstracts_sync.py ${{ matrix.config_path }} --posts-per-job 256
+          python obstracts_sync.py ${{ matrix.config_path }} --posts-per-job 5
