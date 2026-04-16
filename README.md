@@ -71,6 +71,13 @@ See the `examples/` directory for sample commands showing how to use this script
 
 sitemap2posts includes `obstracts_sync.py` for direct synchronization to Obstracts feeds.
 
+The Obstracts integration now supports:
+- Individual feed configuration files organized by category (`main/`, `issues/`, `examples/`)
+- Automatic feed discovery with `discover_feeds.py`
+- GitHub Actions matrix strategy for parallel feed processing
+- Configurable batch processing with `--posts-per-job`
+- Job completion tracking with automatic status monitoring
+
 See [obstracts/README.md](obstracts/README.md) for detailed documentation.
 
 ## Useful link

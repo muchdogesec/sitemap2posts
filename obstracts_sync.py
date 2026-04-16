@@ -8,6 +8,7 @@ Processes one feed per run - use GitHub Actions matrix for multiple feeds.
 Supports GitHub Actions output with job summaries.
 """
 
+import contextlib
 import json
 import os
 import sys
@@ -73,6 +74,14 @@ class GitHubActionsOutput:
 class JobCreationFailed(Exception):
     pass
 
+@contextlib.contextmanager
+def log_collapsed(title: str):
+    """Context manager for collapsible log sections in GitHub Actions."""
+    print(f"::group::{title}")
+    try:
+        yield
+    finally:
+        print("::endgroup::")
 
 class ObstractsAPIClient:
     """Client for interacting with the Obstracts API."""
@@ -96,7 +105,7 @@ class ObstractsAPIClient:
         )
 
     def wait_for_job(
-        self, job_id: str, poll_interval: int = 5, timeout: int = 300
+        self, job_id: str, poll_interval: int = 5, timeout: int = 600
     ) -> Dict:
         """
         Wait for a job to complete by polling its status.
@@ -104,7 +113,7 @@ class ObstractsAPIClient:
         Args:
             job_id: The ID of the job to wait for
             poll_interval: Seconds between status checks (default: 5)
-            timeout: Maximum time to wait in seconds (default: 300)
+            timeout: Maximum time to wait in seconds (default: 600)
 
         Returns:
             Job details dictionary
@@ -134,6 +143,7 @@ class ObstractsAPIClient:
                     if state in ["processed", "failed"]:
                         logging.info(f"Job {job_id} completed with state: {state}")
                         return job_data
+                    logging.debug(f"Job {job_id}, state={state}, waiting {poll_interval} seconds...")
 
                     # Job is still processing
                     time.sleep(poll_interval)
@@ -205,9 +215,10 @@ class ObstractsAPIClient:
                 if retry:
                     logging.info(f"Retry sending posts, {retry}/2 retries")
                 try:
-                    job, _failed_posts = self._submit_posts(
-                        feed_id, profile_id, batch_posts
-                    )
+                    with log_collapsed(f"Submitting batch {batch_num} (attempt {retry + 1})"):
+                        job, _failed_posts = self._submit_posts(
+                            feed_id, profile_id, batch_posts
+                        )
                     if _failed_posts:
                         failed_posts.extend(_failed_posts)
                         all_failed_posts.extend(_failed_posts)
@@ -233,7 +244,8 @@ class ObstractsAPIClient:
                         )
 
                         # Wait for this job to complete
-                        completed_job = self.wait_for_job(job_id)
+                        with log_collapsed(f"Waiting for job {job_id}| Batch {batch_num}"):
+                            completed_job = self.wait_for_job(job_id)
 
                         all_jobs.append(
                             {
@@ -288,6 +300,7 @@ class ObstractsAPIClient:
 
         # Prepare payload
         payload = {"posts": posts, "profile_id": profile_id}
+        logging.debug(f"Submitting posts to {endpoint}, payload: {payload}")
         response = self.session.post(endpoint, json=payload)
         failed_posts = []
 
@@ -305,7 +318,7 @@ class ObstractsAPIClient:
                 f"Some errors encountered while submitting posts: {response.text}"
             )
             error_data = response.json().get("details", {})
-            if "posts" not in error_data:
+            if not isinstance(error_data.get("posts"), dict):
                 raise JobCreationFailed(error_data)
             for index, error in error_data["posts"].items():
                 index = int(index)
@@ -838,7 +851,7 @@ multiple feeds in parallel.
     parser.add_argument(
         "--posts-per-job",
         type=int,
-        default=None,
+        required=True,
         help="Maximum number of posts to send per job (default: no batching, all posts in one job)",
     )
 
