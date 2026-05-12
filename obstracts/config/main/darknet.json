@@ -9,12 +9,9 @@
     "profile_id": "a8c00d89-b71e-51b7-84a6-fec3c5bdf7f6",
     "remove_404_records": true,
     "path_allow_list": [
-        "https://www.darknet.org.uk/*"
+        "https://www.darknet.org.uk/2*"
     ],
-    "path_ignore_list": [
-        "https://www.darknet.org.uk/"
-    ],
-    "omit_author": false,
+    "omit_author": true,
     "preferred_date": "P",
     "name": "Darknet"
 }

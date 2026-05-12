@@ -210,17 +210,7 @@ python3 sitemap2posts.py https://securityledger.com/ \
     --output obstracts/output/securityledger_blog.json
 ```
 
-### darknet (`6570f61e-62d2-5ee9-a8ec-f417200f5dc0`)
 
-https://github.com/muchdogesec/sitemap2posts/issues/31
-
-```shell
-python3 sitemap2posts.py https://www.darknet.org.uk/ \
-    --lastmod_min 2020-01-01 \
-    --sitemap_urls https://www.darknet.org.uk/post-sitemap1.xml https://www.darknet.org.uk/post-sitemap2.xml https://www.darknet.org.uk/post-sitemap3.xml \
-    --remove_404_records \
-    --output obstracts/output/darknet_blog.json
-```
 
 ### Bushido Token (`11287bc4-bdf7-5700-a278-efa2cdc85b9d`)
 
@@ -263,6 +253,16 @@ python3 sitemap2posts.py https://blog.fox-it.com/ \
     --sitemap_urls https://blog.fox-it.com/sitemap.xml \
     --remove_404_records \
     --output obstracts/output/foxit_blog.json
+```
+
+### darknet
+
+```shell
+python3 sitemap2posts.py https://www.darknet.org.uk/ \
+    --lastmod_min 2020-01-01 \
+    --sitemap_urls https://www.darknet.org.uk/post-sitemap1.xml https://www.darknet.org.uk/post-sitemap2.xml https://www.darknet.org.uk/post-sitemap3.xml \
+    --remove_404_records \
+    --output obstracts/output/darknet_blog.json
 ```
 
 ---
