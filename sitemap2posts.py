@@ -62,8 +62,12 @@ def fetch_url(url, timeout=10):
         return None
 
 
-def get_sitemaps_from_robots(url):
-    """Extract sitemap URLs from robots.txt."""
+def get_sitemaps_from_robots(url, allow_list=None):
+    """Extract sitemap URLs from robots.txt.
+
+    If allow_list is provided, only sitemaps matching one of the patterns
+    are returned.
+    """
     logging.info(f"Fetching robots.txt from {url}")
     robots_url = urljoin(url, "/robots.txt")
     response = fetch_url(robots_url)
@@ -79,6 +83,22 @@ def get_sitemaps_from_robots(url):
         logging.error("No sitemaps found in robots.txt.")
     else:
         logging.info(f"Found {len(sitemaps)} sitemap(s) in robots.txt")
+
+    if allow_list:
+        logging.info("Applying --robots_allow_list filter (supports glob patterns)")
+        before_filter_count = len(sitemaps)
+        sitemaps = [
+            sitemap
+            for sitemap in sitemaps
+            if any(url_matches_pattern(sitemap, pattern) for pattern in allow_list)
+        ]
+        logging.info(
+            f"{len(sitemaps)} sitemap(s) remain after applying --robots_allow_list filter"
+        )
+        if before_filter_count and not sitemaps:
+            logging.warning(
+                "No robots.txt sitemap entries matched --robots_allow_list"
+            )
 
     return sitemaps
 
@@ -277,7 +297,12 @@ def filter_urls_by_base(urls, base_url):
 
 
 def url_matches_pattern(url, pattern):
-    return fnmatch(url, pattern)
+    """Check if URL matches a pattern (supports both prefix and glob patterns)."""
+    # If pattern contains glob characters, use fnmatch
+    if "*" in pattern or "?" in pattern or "[" in pattern:
+        return fnmatch(url, pattern) or url.startswith(pattern)
+    # Otherwise, use simple prefix matching
+    return url.startswith(pattern)
 
 
 def filter_urls_by_paths(urls, ignore_paths=None, allow_paths=None):
@@ -370,6 +395,7 @@ def fetch_post_titles(urls, remove_404_records=False):
 def sitemap2posts(
     blog_url,
     sitemap_urls=None,
+    robots_allow_list=None,
     lastmod_min=None,
     path_ignore_list=None,
     path_allow_list=None,
@@ -377,15 +403,32 @@ def sitemap2posts(
     remove_404_records=False,
 ):
     """Main function to crawl sitemaps and extract post information."""
-    lastmod_min = lastmod_min and make_dt_utc(lastmod_min)
+    
+    sitemap_urls = set(sitemap_urls)
+    robots_allow_list = set(robots_allow_list)
+
+    robots_sitemaps = []
+    should_fetch_robots = (not sitemap_urls) or robots_allow_list
+    robots_sitemaps = set()
+
+    if should_fetch_robots:
+        if sitemap_urls:
+            logging.info("Combining explicit sitemap URLs with robots.txt sitemaps")
+        else:
+            logging.info("Using sitemaps from robots.txt")
+        robots_sitemaps.update(get_sitemaps_from_robots(blog_url, robots_allow_list))
+
+    sitemap_urls.update(robots_sitemaps)
 
     if not sitemap_urls:
-        logging.info("Using sitemaps from robots.txt")
-        sitemap_urls = get_sitemaps_from_robots(blog_url)
-    if not sitemap_urls:
-        logging.error(
-            "No sitemaps are defined in this website's robots.txt file, so it cannot be crawled."
-        )
+        if robots_allow_list:
+            logging.error(
+                "No sitemaps are defined in this website's robots.txt file that match --robots_allow_list, so it cannot be crawled."
+            )
+        else:
+            logging.error(
+                "No sitemaps are defined in this website's robots.txt file, so it cannot be crawled."
+            )
         return []
 
     # Collect URLs from all sitemaps
@@ -420,6 +463,7 @@ def parse_cli_arguments():
         epilog="""Examples:
   robots mode:      python sitemap2posts.py https://example.com/blog/
   sitemap_urls mode: python sitemap2posts.py https://example.com/blog/ --sitemap_urls https://example.com/sitemap1.xml https://example.com/sitemap2.xml
+  mixed mode:       python sitemap2posts.py https://example.com/blog/ --sitemap_urls https://example.com/sitemap1.xml --robots_allow_list 'https://example.com/*-sitemap.xml'
         """,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
@@ -436,9 +480,17 @@ def parse_cli_arguments():
     )
     parser.add_argument(
         "--sitemap_urls",
+        "--sitemap-urls",
         type=str,
         nargs="+",
-        help="One or more sitemap URLs to crawl directly (automatically uses sitemap_urls mode)",
+        help="One or more sitemap URLs to crawl directly (robots.txt is skipped unless --robots_allow_list is set)",
+    )
+    parser.add_argument(
+        "--robots_allow_list",
+        "--robots-allow-list",
+        type=str,
+        nargs="+",
+        help="Allow-list patterns for sitemap URLs discovered in robots.txt (supports glob patterns). Example: 'https://example.com/*-sitemap.xml'",
     )
     parser.add_argument(
         "--lastmod_min",
@@ -449,6 +501,7 @@ def parse_cli_arguments():
     )
     parser.add_argument(
         "--path_ignore_list",
+        "--path-ignore-list",
         type=str,
         nargs="+",
         default=[],
@@ -463,6 +516,7 @@ def parse_cli_arguments():
     )
     parser.add_argument(
         "--ignore_sitemaps",
+        "--ignore-sitemaps",
         type=str,
         nargs="+",
         default=[],
@@ -470,6 +524,7 @@ def parse_cli_arguments():
     )
     parser.add_argument(
         "--remove_404_records",
+        "--remove-404-records",
         action="store_true",
         help="Exclude URLs that return a 404 status code.",
     )
@@ -483,6 +538,7 @@ if __name__ == "__main__":
     posts = sitemap2posts(
         args.blog_url,
         sitemap_urls=args.sitemap_urls,
+        robots_allow_list=args.robots_allow_list,
         lastmod_min=args.lastmod_min,
         path_ignore_list=args.path_ignore_list,
         path_allow_list=args.path_allow_list,

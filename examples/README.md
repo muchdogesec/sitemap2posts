@@ -43,6 +43,23 @@ python sitemap2posts.py https://www.crowdstrike.com/blog/ \
 	--output crowdstrike_blog.json
 ```
 
+### Mixed Mode: Explicit URLs Plus Robots Allow-List
+
+```shell
+python sitemap2posts.py https://www.crowdstrike.com/blog/ \
+	--sitemap_urls https://www.crowdstrike.com/post-sitemap.xml \
+	--robots_allow_list 'https://www.crowdstrike.com/*-sitemap.xml' \
+	--output crowdstrike_blog.json
+```
+
+### Robots Allow-List Only
+
+```shell
+python sitemap2posts.py https://www.crowdstrike.com/blog/ \
+	--robots_allow_list 'https://www.crowdstrike.com/*-sitemap.xml' \
+	--output crowdstrike_blog.json
+```
+
 ### Complete Example with All Filters
 
 ```shell
