@@ -519,6 +519,7 @@ def process_feed(
     sitemap_urls = feed_config.get("sitemap_urls", [])
     profile_id = feed_config.get("profile_id")
     lastmod_min = feed_config.get("lastmod_min")
+    robots_allow_list = feed_config.get("robots_allow_list")
 
     feed_details = api_client.get_feed_details(feed_id)  # Ensure feed exists
     if not feed_details:
@@ -591,6 +592,7 @@ def process_feed(
     posts = sitemap2posts(
         blog_url,
         sitemap_urls=sitemap_urls,
+        robots_allow_list=robots_allow_list,
         lastmod_min=lastmod_min_date,
         path_ignore_list=feed_config.get("path_ignore_list"),
         path_allow_list=feed_config.get("path_allow_list"),

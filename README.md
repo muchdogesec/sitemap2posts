@@ -14,9 +14,14 @@ sitemap2posts is designed to identify all posts for a blog, using sitemaps. It c
 
 ## Features
 
-- **Two modes of operation:**
-  - `robots` mode (default): Automatically discovers sitemaps from robots.txt
-  - `sitemap_urls` mode: Directly specify sitemap URLs to crawl
+- **Sitemap source selection:**
+  - Default `robots` discovery: Automatically discovers sitemaps from robots.txt
+  - Explicit `sitemap_urls`: Directly specify sitemap URLs to crawl
+  - Mixed mode: Merge explicit sitemap URLs with robots.txt entries that match `--robots_allow_list`
+- **Robots sitemap allow-list:**
+  - Limit robots.txt-discovered sitemaps with `--robots_allow_list`
+  - Supports prefix and glob matching via the same matching rules used elsewhere in the tool
+  - Can be combined with explicit `--sitemap_urls`
 - **Smart data extraction**
 	- Will extract title, authors and publish date from the report
 - **Advanced filtering:**
@@ -55,7 +60,8 @@ python sitemap2posts.py BLOG_URL
 ### Command-Line Options
 
 * **`blog_url`** (positional): Blog URL to extract posts from
-* **`--sitemap_urls`**: One or more sitemap URLs to crawl directly (automatically uses sitemap_urls mode instead of robots mode)
+* **`--sitemap_urls`**: One or more sitemap URLs to crawl directly. If this is the only sitemap source option provided, robots.txt is not fetched.
+* **`--robots_allow_list`**: Allow-list patterns for sitemap URLs discovered in robots.txt. If combined with `--sitemap_urls`, the allowed robots.txt sitemaps are merged with the explicit sitemap URLs.
 * **`--output`**: Output JSON file name (default: `sitemap_posts.json`)
 * **`--lastmod_min`**: Filter URLs with lastmod date on or after this date (format: `YYYY-MM-DD`)
 * **`--path_ignore_list`**: Path patterns to ignore. Supports glob patterns (`*`, `?`, `[...]`). Examples: `/blog/author`, `*/tag/*`, `https://example.com/*/archive`
@@ -63,9 +69,40 @@ python sitemap2posts.py BLOG_URL
 * **`--ignore_sitemaps`**: Comma-separated list of specific sitemap URLs to ignore
 * **`--remove_404_records`**: Exclude URLs that return a 404 status code (checked during title fetch to avoid duplicate requests)
 
+### Sitemap Source Selection
+
+The sitemap source rules are:
+
+* No `--sitemap_urls` and no `--robots_allow_list`: crawl all sitemaps from robots.txt
+* No `--sitemap_urls` and `--robots_allow_list`: crawl only the robots.txt sitemaps that match the allow-list
+* `--sitemap_urls` and no `--robots_allow_list`: crawl only the explicit sitemap URLs
+* `--sitemap_urls` and `--robots_allow_list`: crawl the explicit sitemap URLs plus the robots.txt sitemaps that match the allow-list
+
 ### Examples
 
-See the `examples/` directory for sample commands showing how to use this script.
+```shell
+# Crawl all robots.txt sitemaps
+python sitemap2posts.py https://www.crowdstrike.com/blog/ \
+  --output crowdstrike_blog.json
+
+# Crawl only robots.txt sitemaps that match a pattern
+python sitemap2posts.py https://www.crowdstrike.com/blog/ \
+  --robots_allow_list 'https://www.crowdstrike.com/*-sitemap.xml' \
+  --output crowdstrike_blog.json
+
+# Crawl explicit sitemap URLs only
+python sitemap2posts.py https://www.crowdstrike.com/blog/ \
+  --sitemap_urls https://www.crowdstrike.com/post-sitemap.xml https://www.crowdstrike.com/post-sitemap2.xml \
+  --output crowdstrike_blog.json
+
+# Merge explicit sitemap URLs with allow-listed robots.txt sitemap URLs
+python sitemap2posts.py https://www.crowdstrike.com/blog/ \
+  --sitemap_urls https://www.crowdstrike.com/post-sitemap.xml \
+  --robots_allow_list 'https://www.crowdstrike.com/*-sitemap.xml' \
+  --output crowdstrike_blog.json
+```
+
+See the `examples/` directory for more sample commands showing how to use this script.
 
 ## Obstracts Integration
 

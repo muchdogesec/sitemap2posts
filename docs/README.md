@@ -12,9 +12,9 @@ User can also use additional patterns to filter.
 
 ### Step 2: Script grabs sitemap
 
-To do this the script hits the `robot.txt` file of the root URL.
+To do this the script hits the `robots.txt` file of the root URL.
 
-e.g. `https://www.crowdstrike.com/robot.txt`
+e.g. `https://www.crowdstrike.com/robots.txt`
 
 This can return one or more `Sitemap` entries.
 
@@ -25,7 +25,7 @@ Sitemap: https://www.crowdstrike.com/blog/sitemap_index.xml
 Sitemap: https://www.crowdstrike.com/falcon-sitemap.xml
 ```
 
-Note, if user enters sitemap URLs directly, robots.txt is ignored.
+Note, if user enters sitemap URLs directly, robots.txt is ignored unless `--robots_allow_list` is also provided.
 
 ### Step 3: Script crawls all URLs in the sitemaps
 
