@@ -1,8 +1,9 @@
 {
     "feed_id": "6a9b10fe-0158-502e-9ec2-79149fcf2ea1",
     "blog_url": "https://binarydefense.com/resources/blog/",
-    "sitemap_urls": [
-        "https://binarydefense.com/sitemaps-1-section-resources-1-sitemap.xml"
+    "sitemap_allow_list": [
+        "https://binarydefense.com/sitemaps-1-section-resources-*",
+        "https://binarydefense.com/sitemaps-1-section-news-*"
     ],
     "profile_id": "a8c00d89-b71e-51b7-84a6-fec3c5bdf7f6",
     "remove_404_records": true,
@@ -15,5 +16,5 @@
     "omit_author": true,
     "preferred_date": "H",
     "name": "Binary Defense",
-    "use_robots_txt": false
+    "use_robots_txt": true
 }

@@ -1,7 +1,7 @@
 {
     "feed_id": "11287bc4-bdf7-5700-a278-efa2cdc85b9d",
     "blog_url": "https://blog.bushidotoken.net/",
-    "sitemap_urls": [
+    "sitemap_allow_list": [
         "https://blog.bushidotoken.net/sitemap.xml"
     ],
     "profile_id": "a8c00d89-b71e-51b7-84a6-fec3c5bdf7f6",
@@ -15,5 +15,5 @@
     "omit_author": true,
     "preferred_date": "H",
     "name": "Bushidotoken Blog",
-    "use_robots_txt": false
+    "use_robots_txt": true
 }
