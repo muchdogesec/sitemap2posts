@@ -1,11 +1,15 @@
 {
     "feed_id": "9102b220-4788-567a-bd30-8135d28fa43e",
     "blog_url": "https://arcticwolf.com/resources/blog/",
+    "use_robots_txt": false,
     "sitemap_urls": [
         "https://arcticwolf.com/sitemap_index.xml"
     ],
     "sitemap_allow_list": [
-        "https://arcticwolf.com/post-sitemap*.xml"
+        "https://arcticwolf.com/post-sitemap.xml",
+        "https://arcticwolf.com/post-sitemap2.xml",
+        "https://arcticwolf.com/post-sitemap3.xml",
+        "https://arcticwolf.com/post-sitemap4.xml"
     ],
     "profile_id": "a8c00d89-b71e-51b7-84a6-fec3c5bdf7f6",
     "remove_404_records": true,

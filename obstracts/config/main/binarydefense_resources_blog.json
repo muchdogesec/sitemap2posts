@@ -1,6 +1,7 @@
 {
     "feed_id": "6a9b10fe-0158-502e-9ec2-79149fcf2ea1",
     "blog_url": "https://binarydefense.com/resources/blog/",
+    "use_robots_txt": true,
     "sitemap_allow_list": [
         "https://binarydefense.com/sitemaps-1-section-resources-*",
         "https://binarydefense.com/sitemaps-1-section-news-*"
