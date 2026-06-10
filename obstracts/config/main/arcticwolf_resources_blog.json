@@ -1,8 +1,9 @@
 {
     "feed_id": "9102b220-4788-567a-bd30-8135d28fa43e",
     "blog_url": "https://arcticwolf.com/resources/blog/",
+    "robots_txt_exists": false,
     "sitemap_urls": [
-        "https://arcticwolf.com/post-sitemap.xml",
+        "https://arcticwolf.com/post-sitemap*.xml",
         "https://arcticwolf.com/post-sitemap2.xml",
         "https://arcticwolf.com/post-sitemap3.xml "
     ],
@@ -16,5 +17,6 @@
     ],
     "omit_author": true,
     "preferred_date": "P",
-    "name": "Arctic Wolf"
+    "name": "Arctic Wolf",
+    "notes": "No robots.txt"
 }
