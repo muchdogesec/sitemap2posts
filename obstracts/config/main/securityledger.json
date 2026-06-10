@@ -16,5 +16,6 @@
     ],
     "omit_author": false,
     "preferred_date": "P",
-    "name": "Security Ledger"
+    "name": "Security Ledger",
+    "use_robots_txt": false
 }

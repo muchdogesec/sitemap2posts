@@ -4,6 +4,7 @@
 
 ```shell
 python sitemap2posts.py https://www.crowdstrike.com/blog/ \
+	--use-robots-txt \
 	--output crowdstrike_blog.json
 ```
 
@@ -11,6 +12,7 @@ python sitemap2posts.py https://www.crowdstrike.com/blog/ \
 
 ```shell
 python sitemap2posts.py https://www.crowdstrike.com/blog/ \
+	--use-robots-txt \
 	--lastmod_min 2024-01-01 \
 	--output crowdstrike_blog.json
 ```
@@ -20,16 +22,19 @@ python sitemap2posts.py https://www.crowdstrike.com/blog/ \
 ```shell
 # Ignore specific paths
 python sitemap2posts.py https://www.crowdstrike.com/blog/ \
+	--use-robots-txt \
 	--path_ignore_list /blog/author '*/tag/*' \
 	--output crowdstrike_blog.json
 
 # Only allow specific paths
 python sitemap2posts.py https://www.crowdstrike.com/blog/ \
+	--use-robots-txt \
 	--path_allow_list '/blog/*/2024/*' '/blog/*/2025/*' \
 	--output crowdstrike_blog.json
 
 # Combine allow and ignore lists
 python sitemap2posts.py https://www.crowdstrike.com/blog/ \
+	--use-robots-txt \
 	--path_allow_list '/blog/*' \
 	--path_ignore_list /blog/author '*/tag/*' \
 	--output crowdstrike_blog.json
@@ -40,6 +45,7 @@ python sitemap2posts.py https://www.crowdstrike.com/blog/ \
 ```shell
 python sitemap2posts.py https://www.crowdstrike.com/blog/ \
 	--sitemap_urls https://www.crowdstrike.com/post-sitemap.xml https://www.crowdstrike.com/post-sitemap2.xml \
+	--no-use-robots-txt \
 	--output crowdstrike_blog.json
 ```
 
@@ -48,7 +54,8 @@ python sitemap2posts.py https://www.crowdstrike.com/blog/ \
 ```shell
 python sitemap2posts.py https://www.crowdstrike.com/blog/ \
 	--sitemap_urls https://www.crowdstrike.com/post-sitemap.xml \
-	--robots_allow_list 'https://www.crowdstrike.com/*-sitemap.xml' \
+	--use-robots-txt \
+	--sitemap_allow_list 'https://www.crowdstrike.com/*-sitemap.xml' \
 	--output crowdstrike_blog.json
 ```
 
@@ -56,7 +63,7 @@ python sitemap2posts.py https://www.crowdstrike.com/blog/ \
 
 ```shell
 python sitemap2posts.py https://www.crowdstrike.com/blog/ \
-	--robots_allow_list 'https://www.crowdstrike.com/*-sitemap.xml' \
+	--sitemap_allow_list 'https://www.crowdstrike.com/*-sitemap.xml' \
 	--output crowdstrike_blog.json
 ```
 

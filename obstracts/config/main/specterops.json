@@ -14,5 +14,6 @@
     ],
     "omit_author": true,
     "preferred_date": "P",
-    "name": "SpecterOps"
+    "name": "SpecterOps",
+    "use_robots_txt": false
 }

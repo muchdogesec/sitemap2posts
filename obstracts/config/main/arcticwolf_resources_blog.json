@@ -16,5 +16,6 @@
     ],
     "omit_author": true,
     "preferred_date": "P",
-    "name": "Arctic Wolf"
+    "name": "Arctic Wolf",
+    "use_robots_txt": false
 }

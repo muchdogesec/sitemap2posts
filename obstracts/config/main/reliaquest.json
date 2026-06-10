@@ -14,5 +14,6 @@
     ],
     "omit_author": true,
     "preferred_date": "H",
-    "name": "ReliaQuest"
+    "name": "ReliaQuest",
+    "use_robots_txt": false
 }

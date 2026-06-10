@@ -62,10 +62,10 @@ def fetch_url(url, timeout=10):
         return None
 
 
-def get_sitemaps_from_robots(url, allow_list=None):
+def get_sitemaps_from_robots(url, sitemap_allow_list=None):
     """Extract sitemap URLs from robots.txt.
 
-    If allow_list is provided, only sitemaps matching one of the patterns
+    If sitemap_allow_list is provided, only sitemaps matching one of the patterns
     are returned.
     """
     logging.info(f"Fetching robots.txt from {url}")
@@ -84,21 +84,22 @@ def get_sitemaps_from_robots(url, allow_list=None):
     else:
         logging.info(f"Found {len(sitemaps)} sitemap(s) in robots.txt")
 
-    if allow_list:
-        logging.info("Applying --robots_allow_list filter (supports glob patterns)")
+    if sitemap_allow_list:
+        logging.info("Applying --sitemap_allow_list filter (supports glob patterns)")
         before_filter_count = len(sitemaps)
         sitemaps = [
             sitemap
             for sitemap in sitemaps
-            if any(url_matches_pattern(sitemap, pattern) for pattern in allow_list)
+            if any(
+                url_matches_pattern(sitemap, pattern)
+                for pattern in sitemap_allow_list
+            )
         ]
         logging.info(
-            f"{len(sitemaps)} sitemap(s) remain after applying --robots_allow_list filter"
+            f"{len(sitemaps)} sitemap(s) remain after applying --sitemap_allow_list filter"
         )
         if before_filter_count and not sitemaps:
-            logging.warning(
-                "No robots.txt sitemap entries matched --robots_allow_list"
-            )
+            logging.warning("No robots.txt sitemap entries matched --sitemap_allow_list")
 
     return sitemaps
 
@@ -248,27 +249,55 @@ def should_skip_sitemap(sitemap, ignore_sitemaps):
     return False
 
 
-def collect_urls_from_sitemaps(sitemaps, ignore_sitemaps):
+def sitemap_matches_allow_list(sitemap, sitemap_allow_list):
+    """Check whether a sitemap matches the allow-list, if one is set."""
+    if not sitemap_allow_list:
+        return True
+
+    return any(
+        url_matches_pattern(sitemap, pattern) for pattern in sitemap_allow_list
+    )
+
+
+def collect_urls_from_sitemap(sitemap, ignore_sitemaps, sitemap_allow_list=None):
+    """Collect all URLs from a sitemap or sitemap index."""
+    if should_skip_sitemap(sitemap, ignore_sitemaps):
+        return []
+
+    urls, is_sitemap_index = get_sitemap_urls(sitemap)
+
+    if is_sitemap_index:
+        all_urls = []
+        for sub_sitemap in urls:
+            if should_skip_sitemap(sub_sitemap, ignore_sitemaps):
+                continue
+            if not sitemap_matches_allow_list(sub_sitemap, sitemap_allow_list):
+                logging.info(
+                    f"Skipping sitemap {sub_sitemap} as it does not match --sitemap_allow_list"
+                )
+                continue
+            all_urls.extend(
+                collect_urls_from_sitemap(
+                    sub_sitemap,
+                    ignore_sitemaps,
+                    sitemap_allow_list=sitemap_allow_list,
+                )
+            )
+        return all_urls
+
+    return [(url, lastmod, sitemap) for url, lastmod in urls]
+
+
+def collect_urls_from_sitemaps(sitemaps, ignore_sitemaps, sitemap_allow_list=None):
     """Collect all URLs from a list of sitemaps."""
     all_urls = []
 
     for sitemap in sitemaps:
-        if should_skip_sitemap(sitemap, ignore_sitemaps):
-            continue
-
-        urls, is_sitemap_index = get_sitemap_urls(sitemap)
-
-        if is_sitemap_index:
-            for sub_sitemap in urls:
-                if should_skip_sitemap(sub_sitemap, ignore_sitemaps):
-                    continue
-
-                sub_urls, _ = get_sitemap_urls(sub_sitemap)
-                all_urls.extend(
-                    [(url, lastmod, sub_sitemap) for url, lastmod in sub_urls]
-                )
-        else:
-            all_urls.extend([(url, lastmod, sitemap) for url, lastmod in urls])
+        all_urls.extend(
+            collect_urls_from_sitemap(
+                sitemap, ignore_sitemaps, sitemap_allow_list=sitemap_allow_list
+            )
+        )
 
     return all_urls
 
@@ -395,35 +424,47 @@ def fetch_post_titles(urls, remove_404_records=False):
 def sitemap2posts(
     blog_url,
     sitemap_urls=None,
-    robots_allow_list=None,
+    sitemap_allow_list=None,
+    use_robots_txt=None,
     lastmod_min=None,
     path_ignore_list=None,
     path_allow_list=None,
     ignore_sitemaps=None,
     remove_404_records=False,
+    robots_allow_list=None,
+    robots_sitemap_allow_list=None,
 ):
     """Main function to crawl sitemaps and extract post information."""
-    
-    sitemap_urls = set(sitemap_urls)
-    robots_allow_list = set(robots_allow_list)
+    if sitemap_allow_list is None:
+        sitemap_allow_list = robots_allow_list if robots_allow_list is not None else robots_sitemap_allow_list
 
-    robots_sitemaps = []
-    should_fetch_robots = (not sitemap_urls) or robots_allow_list
-    robots_sitemaps = set()
+    sitemap_urls = list(dict.fromkeys(sitemap_urls or []))
 
-    if should_fetch_robots:
+    if use_robots_txt is None:
+        use_robots_txt = not bool(sitemap_urls)
+
+    if not use_robots_txt and not sitemap_urls:
+        logging.error(
+            "At least one --sitemap_urls value is required when --no-use-robots-txt is set."
+        )
+        return []
+
+    if use_robots_txt:
         if sitemap_urls:
             logging.info("Combining explicit sitemap URLs with robots.txt sitemaps")
         else:
             logging.info("Using sitemaps from robots.txt")
-        robots_sitemaps.update(get_sitemaps_from_robots(blog_url, robots_allow_list))
-
-    sitemap_urls.update(robots_sitemaps)
+        robots_sitemaps = get_sitemaps_from_robots(blog_url, sitemap_allow_list)
+        sitemap_urls = list(dict.fromkeys([*sitemap_urls, *robots_sitemaps]))
 
     if not sitemap_urls:
-        if robots_allow_list:
+        if not use_robots_txt:
             logging.error(
-                "No sitemaps are defined in this website's robots.txt file that match --robots_allow_list, so it cannot be crawled."
+                "No sitemap URLs were provided and --use-robots-txt is disabled."
+            )
+        elif sitemap_allow_list:
+            logging.error(
+                "No sitemaps are defined in this website's robots.txt file that match --sitemap_allow_list, so it cannot be crawled."
             )
         else:
             logging.error(
@@ -432,7 +473,9 @@ def sitemap2posts(
         return []
 
     # Collect URLs from all sitemaps
-    all_urls = collect_urls_from_sitemaps(sitemap_urls, ignore_sitemaps)
+    all_urls = collect_urls_from_sitemaps(
+        sitemap_urls, ignore_sitemaps, sitemap_allow_list=sitemap_allow_list
+    )
 
     # Deduplicate URLs
     deduped_urls = dedupe_urls(all_urls)
@@ -461,9 +504,9 @@ def parse_cli_arguments():
     parser = argparse.ArgumentParser(
         description="Retrieve blog posts from sitemap.",
         epilog="""Examples:
-  robots mode:      python sitemap2posts.py https://example.com/blog/
-  sitemap_urls mode: python sitemap2posts.py https://example.com/blog/ --sitemap_urls https://example.com/sitemap1.xml https://example.com/sitemap2.xml
-  mixed mode:       python sitemap2posts.py https://example.com/blog/ --sitemap_urls https://example.com/sitemap1.xml --robots_allow_list 'https://example.com/*-sitemap.xml'
+  robots mode:      python sitemap2posts.py https://example.com/blog/ --use-robots-txt
+  sitemap_urls mode: python sitemap2posts.py https://example.com/blog/ --sitemap_urls https://example.com/sitemap1.xml https://example.com/sitemap2.xml --no-use-robots-txt
+  mixed mode:       python sitemap2posts.py https://example.com/blog/ --sitemap_urls https://example.com/sitemap1.xml --use-robots-txt --sitemap_allow_list 'https://example.com/*-sitemap.xml'
         """,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
@@ -483,14 +526,28 @@ def parse_cli_arguments():
         "--sitemap-urls",
         type=str,
         nargs="+",
-        help="One or more sitemap URLs to crawl directly (robots.txt is skipped unless --robots_allow_list is set)",
+        help="One or more sitemap URLs to crawl directly. Robots.txt is skipped by default when this is set.",
     )
     parser.add_argument(
-        "--robots_allow_list",
-        "--robots-allow-list",
+        "--sitemap_allow_list",
+        "--sitemap-allow-list",
         type=str,
         nargs="+",
-        help="Allow-list patterns for sitemap URLs discovered in robots.txt (supports glob patterns). Example: 'https://example.com/*-sitemap.xml'",
+        help="Allow-list patterns for sitemap URLs discovered in robots.txt and sitemap indexes (supports glob patterns). Example: 'https://example.com/*-sitemap.xml'",
+    )
+    use_robots_group = parser.add_mutually_exclusive_group(required=True)
+    use_robots_group.add_argument(
+        "--use-robots-txt",
+        "--use_robots_txt",
+        dest="use_robots_txt",
+        action="store_true",
+        help="Fetch sitemap URLs from robots.txt.",
+    )
+    use_robots_group.add_argument(
+        "--no-use-robots-txt",
+        dest="use_robots_txt",
+        action="store_false",
+        help="Skip robots.txt discovery and only crawl explicit sitemap URLs.",
     )
     parser.add_argument(
         "--lastmod_min",
@@ -529,6 +586,10 @@ def parse_cli_arguments():
         help="Exclude URLs that return a 404 status code.",
     )
     args = parser.parse_args()
+
+    if not args.use_robots_txt and not args.sitemap_urls:
+        parser.error("--no-use-robots-txt requires at least one --sitemap_urls value")
+
     return args
 
 if __name__ == "__main__":
@@ -538,7 +599,8 @@ if __name__ == "__main__":
     posts = sitemap2posts(
         args.blog_url,
         sitemap_urls=args.sitemap_urls,
-        robots_allow_list=args.robots_allow_list,
+        sitemap_allow_list=args.sitemap_allow_list,
+        use_robots_txt=args.use_robots_txt,
         lastmod_min=args.lastmod_min,
         path_ignore_list=args.path_ignore_list,
         path_allow_list=args.path_allow_list,

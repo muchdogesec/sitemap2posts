@@ -14,5 +14,6 @@
     ],
     "omit_author": true,
     "preferred_date": "H",
-    "name": "Binary Defense"
+    "name": "Binary Defense",
+    "use_robots_txt": false
 }

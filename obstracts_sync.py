@@ -519,7 +519,10 @@ def process_feed(
     sitemap_urls = feed_config.get("sitemap_urls", [])
     profile_id = feed_config.get("profile_id")
     lastmod_min = feed_config.get("lastmod_min")
-    robots_allow_list = feed_config.get("robots_allow_list")
+    sitemap_allow_list = feed_config.get(
+        "sitemap_allow_list", feed_config.get("robots_allow_list")
+    )
+    use_robots_txt = feed_config.get("use_robots_txt")
 
     feed_details = api_client.get_feed_details(feed_id)  # Ensure feed exists
     if not feed_details:
@@ -553,14 +556,30 @@ def process_feed(
             "error": "Missing required field: profile_id",
         }
 
-    # Determine mode based on presence of sitemap_urls
+    if use_robots_txt is None:
+        logging.error(f"Feed {feed_id}: Missing required field 'use_robots_txt'")
+        return {
+            "feed_id": feed_id,
+            "posts_count": 0,
+            "job_id": None,
+            "success": False,
+            "error": "Missing required field: use_robots_txt",
+        }
+
+    # Determine mode based on sitemap source selection
     logging.info(f"Processing feed: {feed_id}")
-    if sitemap_urls:
+    if sitemap_urls and use_robots_txt:
+        logging.info(
+            f"Mode: mixed, Blog URL: {blog_url}, Sitemap URLs: {len(sitemap_urls)}"
+        )
+    elif sitemap_urls:
         logging.info(
             f"Mode: sitemap_urls, Blog URL: {blog_url}, Sitemap URLs: {len(sitemap_urls)}"
         )
-    else:
+    elif use_robots_txt:
         logging.info(f"Mode: robots, Blog URL: {blog_url}")
+    else:
+        logging.info(f"Mode: disabled, Blog URL: {blog_url}")
 
     # Parse lastmod_min if provided
     lastmod_min_date = None
@@ -592,7 +611,8 @@ def process_feed(
     posts = sitemap2posts(
         blog_url,
         sitemap_urls=sitemap_urls,
-        robots_allow_list=robots_allow_list,
+        sitemap_allow_list=sitemap_allow_list,
+        use_robots_txt=use_robots_txt,
         lastmod_min=lastmod_min_date,
         path_ignore_list=feed_config.get("path_ignore_list"),
         path_allow_list=feed_config.get("path_allow_list"),

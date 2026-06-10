@@ -14,5 +14,6 @@
     ],
     "omit_author": true,
     "preferred_date": "M",
-    "name": "iVerify"
+    "name": "iVerify",
+    "use_robots_txt": false
 }

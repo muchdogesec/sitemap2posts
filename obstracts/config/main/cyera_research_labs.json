@@ -14,5 +14,6 @@
     ],
     "omit_author": false,
     "preferred_date": "H",
-    "name": "Cyera - Research-Labs"
+    "name": "Cyera - Research-Labs",
+    "use_robots_txt": false
 }

@@ -14,5 +14,6 @@
     ],
     "omit_author": true,
     "preferred_date": "H",
-    "name": "Halcyon"
+    "name": "Halcyon",
+    "use_robots_txt": false
 }

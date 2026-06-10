@@ -15,5 +15,6 @@
     ],
     "omit_author": true,
     "preferred_date": "H",
-    "name": "TrustedSec"
+    "name": "TrustedSec",
+    "use_robots_txt": false
 }

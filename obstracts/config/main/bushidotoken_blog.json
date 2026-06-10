@@ -14,5 +14,6 @@
     ],
     "omit_author": true,
     "preferred_date": "H",
-    "name": "Bushidotoken Blog"
+    "name": "Bushidotoken Blog",
+    "use_robots_txt": false
 }

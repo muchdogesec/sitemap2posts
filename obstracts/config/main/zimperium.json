@@ -14,5 +14,6 @@
     ],
     "omit_author": true,
     "preferred_date": "H",
-    "name": "Zimperium"
+    "name": "Zimperium",
+    "use_robots_txt": false
 }

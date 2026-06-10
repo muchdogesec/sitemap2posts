@@ -14,5 +14,6 @@
     ],
     "omit_author": true,
     "preferred_date": "P",
-    "name": "Aqua Security"
+    "name": "Aqua Security",
+    "use_robots_txt": false
 }

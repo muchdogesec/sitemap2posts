@@ -14,5 +14,6 @@
     ],
     "omit_author": false,
     "preferred_date": "H",
-    "name": "Fox-It Blog"
+    "name": "Fox-It Blog",
+    "use_robots_txt": false
 }

@@ -11,5 +11,6 @@
     ],
     "omit_author": true,
     "preferred_date": "P",
-    "name": "Dragos"
+    "name": "Dragos",
+    "use_robots_txt": true
 }

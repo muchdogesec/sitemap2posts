@@ -14,5 +14,6 @@
     ],
     "omit_author": true,
     "preferred_date": "H",
-    "name": "Zscaler - Blogs Security-Research"
+    "name": "Zscaler - Blogs Security-Research",
+    "use_robots_txt": false
 }
