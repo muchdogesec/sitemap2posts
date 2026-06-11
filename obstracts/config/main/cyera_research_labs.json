@@ -1,7 +1,8 @@
 {
     "feed_id": "2f8fc4c3-551b-537c-8cfe-25f1ba89ffb1",
     "blog_url": "https://www.cyera.com/research-labs/",
-    "sitemap_urls": [
+    "use_robots_txt": true,
+    "sitemap_allow_list": [
         "https://www.cyera.com/sitemap.xml"
     ],
     "profile_id": "a8c00d89-b71e-51b7-84a6-fec3c5bdf7f6",

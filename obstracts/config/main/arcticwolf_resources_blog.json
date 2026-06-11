@@ -6,10 +6,7 @@
         "https://arcticwolf.com/sitemap_index.xml"
     ],
     "sitemap_allow_list": [
-        "https://arcticwolf.com/post-sitemap.xml",
-        "https://arcticwolf.com/post-sitemap2.xml",
-        "https://arcticwolf.com/post-sitemap3.xml",
-        "https://arcticwolf.com/post-sitemap4.xml"
+        "https://arcticwolf.com/post-sitemap*"
     ],
     "profile_id": "a8c00d89-b71e-51b7-84a6-fec3c5bdf7f6",
     "remove_404_records": true,
