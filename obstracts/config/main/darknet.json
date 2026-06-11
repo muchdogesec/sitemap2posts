@@ -12,6 +12,5 @@
     ],
     "omit_author": true,
     "preferred_date": "P",
-    "name": "Darknet",
-    "use_robots_txt": false
+    "name": "Darknet"
 }

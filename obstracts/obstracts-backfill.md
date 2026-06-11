@@ -11,7 +11,6 @@ Bad = sitemap approach does not work
 ```shell
 python3 sitemap2posts.py https://www.halcyon.ai/blog/ \
     --path_allow_list 'https://www.halcyon.ai/blog/*' \
-    --lastmod_min 2020-01-01 \
     --sitemap_urls https://www.halcyon.ai/sitemap.xml \
     --remove_404_records \
     --output obstracts/output/halcyon_blog.json
@@ -22,7 +21,6 @@ python3 sitemap2posts.py https://www.halcyon.ai/blog/ \
 ```shell
 python3 sitemap2posts.py https://sublime.security/blog/ \
     --path_allow_list 'https://proxied2.sublime.security/blog/*' \
-    --lastmod_min 2020-01-01 \
     --sitemap_urls https://sublime.security/sitemap.xml \
     --remove_404_records \
     --output obstracts/output/sublime_security_blog.json
@@ -33,7 +31,6 @@ python3 sitemap2posts.py https://sublime.security/blog/ \
 ```shell
 python3 sitemap2posts.py https://iverify.io/blog/ \
     --path_allow_list 'https://iverify.io/blog/*' \
-    --lastmod_min 2020-01-01 \
     --sitemap_urls https://iverify.io/sitemap.xml \
     --remove_404_records \
     --output obstracts/output/iverify_blog.json
@@ -44,7 +41,6 @@ python3 sitemap2posts.py https://iverify.io/blog/ \
 ```shell
 python3 sitemap2posts.py https://censys.com/blog/ \
     --path_allow_list 'https://censys.com/blog/*' \
-    --lastmod_min 2020-01-01 \
     --sitemap_urls https://censys.com/post-sitemap.xml \
     --remove_404_records \
     --output obstracts/output/censys_blog.json
@@ -55,7 +51,6 @@ python3 sitemap2posts.py https://censys.com/blog/ \
 ```shell
 python3 sitemap2posts.py https://specterops.io/blog/ \
     --path_allow_list 'https://specterops.io/blog/*' \
-    --lastmod_min 2020-01-01 \
     --sitemap_urls https://specterops.io/post-sitemap.xml \
     --remove_404_records \
     --output obstracts/output/specterops_blog.json
@@ -65,7 +60,6 @@ python3 sitemap2posts.py https://specterops.io/blog/ \
 
 ```shell
 python3 sitemap2posts.py https://expel.com/blog/ \
-    --lastmod_min 2020-01-01 \
     --sitemap_urls https://expel.com/post-sitemap.xml \
     --remove_404_records \
     --output obstracts/output/expel_blog.json
@@ -86,7 +80,6 @@ No modified dates.
 
 ```shell
 python3 sitemap2posts.py https://www.volexity.com/blog/ \
-    --lastmod_min 2020-01-01 \
     --sitemap_urls https://www.volexity.com/post-sitemap.xml \
     --remove_404_records \
     --output obstracts/output/volexity_blog.json
@@ -96,7 +89,6 @@ python3 sitemap2posts.py https://www.volexity.com/blog/ \
 
 ```shell
 python3 sitemap2posts.py https://www.zscaler.com/blogs/security-research/ \
-    --lastmod_min 2020-01-01 \
     --sitemap_urls https://www.zscaler.com/sitemap.xml \
     --remove_404_records \
     --output obstracts/output/zscaler_blog.json
@@ -106,7 +98,6 @@ python3 sitemap2posts.py https://www.zscaler.com/blogs/security-research/ \
 
 ```shell
 python3 sitemap2posts.py https://www.dragos.com/blog/ \
-    --lastmod_min 2020-01-01 \
     --remove_404_records \
     --output obstracts/output/dragos_blog.json
 ```
@@ -115,7 +106,6 @@ python3 sitemap2posts.py https://www.dragos.com/blog/ \
 
 ```shell
 python3 sitemap2posts.py https://binarydefense.com/resources/blog/ \
-    --lastmod_min 2020-01-01 \
     --sitemap_urls https://binarydefense.com/sitemaps-1-section-resources-1-sitemap.xml \
     --remove_404_records \
     --output obstracts/output/binarydefense_blog.json
@@ -125,7 +115,6 @@ python3 sitemap2posts.py https://binarydefense.com/resources/blog/ \
 
 ```shell
 python3 sitemap2posts.py https://zimperium.com/blog/ \
-    --lastmod_min 2020-01-01 \
     --sitemap_urls https://zimperium.com/sitemap.xml \
     --remove_404_records \
     --output obstracts/output/zimperium_blog.json
@@ -135,7 +124,6 @@ python3 sitemap2posts.py https://zimperium.com/blog/ \
 
 ```shell
 python3 sitemap2posts.py https://www.cyera.com/research-labs \
-    --lastmod_min 2020-01-01 \
     --remove_404_records \
     --output obstracts/output/cyera_blog.json
 ```
@@ -146,7 +134,6 @@ python3 sitemap2posts.py https://www.cyera.com/research-labs \
 
 ```shell
 python3 sitemap2posts.py https://securityscorecard.com/blog/ \
-    --lastmod_min 2020-01-01 \
     --sitemap_urls https://securityscorecard.com/blog-sitemap.xml \
     --remove_404_records \
     --output obstracts/output/securityscorecard_blog.json
@@ -158,7 +145,6 @@ python3 sitemap2posts.py https://securityscorecard.com/blog/ \
 
 ```shell
 python3 sitemap2posts.py https://www.aquasec.com/blog/ \
-    --lastmod_min 2020-01-01 \
     --sitemap_urls https://www.aquasec.com/post-sitemap.xml \
     --remove_404_records \
     --output obstracts/output/aquasec_blog.json
@@ -170,7 +156,6 @@ python3 sitemap2posts.py https://www.aquasec.com/blog/ \
 
 ```shell
 python3 sitemap2posts.py https://arcticwolf.com/resources/blog/ \
-    --lastmod_min 2020-01-01 \
     --sitemap_urls https://arcticwolf.com/post-sitemap.xml https://arcticwolf.com/post-sitemap2.xml https://arcticwolf.com/post-sitemap3.xml https://arcticwolf.com/post-sitemap4.xml \
     --remove_404_records \
     --output obstracts/output/arcticwolf_blog.json
@@ -182,7 +167,6 @@ python3 sitemap2posts.py https://arcticwolf.com/resources/blog/ \
 
 ```shell
 python3 sitemap2posts.py https://nohackie.com/ \
-    --lastmod_min 2020-01-01 \
     --sitemap_urls https://nohackie.com/sitemap.xml  \
     --remove_404_records \
     --output obstracts/output/nohackie_blog.json
@@ -192,7 +176,6 @@ python3 sitemap2posts.py https://nohackie.com/ \
 
 ```shell
 python3 sitemap2posts.py https://reliaquest.com/blog/ \
-    --lastmod_min 2020-01-01 \
     --sitemap_urls https://reliaquest.com/sitemap.xml  \
     --remove_404_records \
     --output obstracts/output/reliaquest_blog.json
@@ -204,19 +187,15 @@ https://github.com/muchdogesec/sitemap2posts/issues/31
 
 ```shell
 python3 sitemap2posts.py https://securityledger.com/ \
-    --lastmod_min 2020-01-01 \
     --sitemap_urls https://securityledger.com/sitemap-1.xml https://securityledger.com/sitemap-2.xml https://securityledger.com/sitemap-3.xml \
     --remove_404_records \
     --output obstracts/output/securityledger_blog.json
 ```
 
-
-
 ### Bushido Token (`11287bc4-bdf7-5700-a278-efa2cdc85b9d`)
 
 ```shell
 python3 sitemap2posts.py https://blog.bushidotoken.net/ \
-    --lastmod_min 2020-01-01 \
     --sitemap_urls https://blog.bushidotoken.net/sitemap.xml \
     --remove_404_records \
     --output obstracts/output/bushidotoken_blog.json
@@ -229,7 +208,6 @@ https://github.com/muchdogesec/history4feed/issues/212
 
 ```shell
 python3 sitemap2posts.py https://trustedsec.com/blog/ \
-    --lastmod_min 2020-01-01 \
     --sitemap_urls https://trustedsec.com/sitemaps-1-section-blog-1-sitemap-p1.xml https://trustedsec.com/sitemaps-1-section-blog-1-sitemap-p2.xml \
     --remove_404_records \
     --output obstracts/output/trustedsec_blog.json
@@ -239,7 +217,6 @@ python3 sitemap2posts.py https://trustedsec.com/blog/ \
 
 ```shell
 python3 sitemap2posts.py https://claroty.com/team82/research/ \
-    --lastmod_min 2020-01-01 \
     --sitemap_urls https://claroty.com/sitemap.xml \
     --remove_404_records \
     --output obstracts/output/claroty_blog.json
@@ -249,7 +226,6 @@ python3 sitemap2posts.py https://claroty.com/team82/research/ \
 
 ```shell
 python3 sitemap2posts.py https://blog.fox-it.com/ \
-    --lastmod_min 2020-01-01 \
     --sitemap_urls https://blog.fox-it.com/sitemap.xml \
     --remove_404_records \
     --output obstracts/output/foxit_blog.json
@@ -259,10 +235,19 @@ python3 sitemap2posts.py https://blog.fox-it.com/ \
 
 ```shell
 python3 sitemap2posts.py https://www.darknet.org.uk/ \
-    --lastmod_min 2020-01-01 \
     --sitemap_urls https://www.darknet.org.uk/post-sitemap1.xml https://www.darknet.org.uk/post-sitemap2.xml https://www.darknet.org.uk/post-sitemap3.xml \
     --remove_404_records \
     --output obstracts/output/darknet_blog.json
+```
+
+### hackerone
+
+```shell
+python3 sitemap2posts.py https://www.hackerone.com/blog/ \
+    --sitemap_urls https://www.hackerone.com/sitemap.xml \
+    --remove_404_records \
+    --no-use-robots-txt \
+    --output obstracts/output/hackerone_blog.json
 ```
 
 ---
@@ -273,7 +258,6 @@ python3 sitemap2posts.py https://www.darknet.org.uk/ \
 
 ```shell
 python3 sitemap2posts.py https://www.bluevoyant.com/blog/ \
-    --lastmod_min 2020-01-01 \
     --sitemap_urls https://www.bluevoyant.com/sitemaps-1-section-blog-1-sitemap.xml  \
     --remove_404_records \
     --output obstracts/output/bluevoyant_blog.json
@@ -283,7 +267,6 @@ python3 sitemap2posts.py https://www.bluevoyant.com/blog/ \
 
 ```shell
 python3 sitemap2posts.py https://www.esentire.com/blog/ \
-    --lastmod_min 2020-01-01 \
     --sitemap_urls https://www.esentire.com/sitemaps-1-section-blog-1-sitemap-p1.xml https://www.esentire.com/sitemaps-1-section-blog-1-sitemap-p2.xml \
     --remove_404_records \
     --output obstracts/output/esentire_blog.json
@@ -295,7 +278,6 @@ error running scrip
 
 ```shell
 python3 sitemap2posts.py https://www.bitsight.com/blog/ \
-    --lastmod_min 2020-01-01 \
     --sitemap_urls https://www.bitsight.com/sitemaps/default/sitemap.xml \
     --remove_404_records \
     --output obstracts/output/bitsight_blog.json
@@ -308,7 +290,6 @@ After a few dozen requests, bitsight starts returning 429 making everything afte
 ```shell
 python3 sitemap2posts.py https://venturebeat.com/security/ \
     --path_allow_list 'https://venturebeat.com/security/*' \
-    --lastmod_min 2020-01-01 \
     --remove_404_records \
     --output obstracts/output/venturebeat_blog.json
 ```
@@ -321,7 +302,6 @@ Too many requests errors.
 
 ```shell
 python3 sitemap2posts.py https://www.validin.com/blog/ \
-    --lastmod_min 2020-01-01 \
     --remove_404_records \
     --output obstracts/output/zimperium_blog.json
 ```
@@ -332,7 +312,6 @@ Sitemap is bad.
 
 ```shell
 python3 sitemap2posts.py https://www.team-cymru.com/blog \
-    --lastmod_min 2020-01-01 \
     --remove_404_records \
     --output obstracts/output/team-cymru_blog.json
 ```
@@ -343,7 +322,6 @@ Sitemap is bad (titles)
 
 ```shell
 python3 sitemap2posts.py https://www.inteleye.io/blog\
-    --lastmod_min 2020-01-01 \
     --remove_404_records \
     --output obstracts/output/inteleye_blog.json
 ```
