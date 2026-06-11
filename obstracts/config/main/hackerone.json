@@ -1,6 +1,6 @@
 {
     "feed_id": "5b0af042-2243-5e6a-92b9-087ace31a2ab",
-    "blog_url": "https://www.aquasec.com/blog/",
+    "blog_url": "https://www.hackerone.com/blog/",
     "use_robots_txt": false,
     "sitemap_urls": [
         "https://www.hackerone.com/sitemap.xml"
