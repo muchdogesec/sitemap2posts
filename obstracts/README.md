@@ -76,9 +76,10 @@ Each feed configuration file supports the following options:
 - **name** (optional): Human-readable feed name (defaults to filename stem)
 - **sitemap_urls** (optional): Array of sitemap URLs to crawl directly
   - If provided on its own, robots.txt is skipped
-  - If combined with a robots sitemap allow-list in the underlying crawler, allowed robots.txt sitemap URLs are merged with the explicit list
+  - If `use_robots_txt` is enabled, allowed robots.txt sitemap URLs are merged with the explicit list
   - If omitted, uses robots mode (discovers sitemaps from robots.txt)
-- **robots_allow_list** (optional): Array of URL patterns to include from the response of robots.txt
+- **use_robots_txt** (required): Whether to fetch sitemap URLs from robots.txt. Must be set to `true` or `false` for every feed configuration.
+- **sitemap_allow_list** (optional): Array of URL patterns to include from robots.txt and sitemap indexes
 - **preferred_date** (optional, default: `"LPHM"`): Order of date sources to try for post publication date. Each character represents a date source:
   - `L` = lastmod (from sitemap `<lastmod>` tag)
   - `H` = htmldate (extracted from HTML content using htmldate library)

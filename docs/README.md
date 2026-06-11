@@ -25,7 +25,9 @@ Sitemap: https://www.crowdstrike.com/blog/sitemap_index.xml
 Sitemap: https://www.crowdstrike.com/falcon-sitemap.xml
 ```
 
-Note, if user enters sitemap URLs directly, robots.txt is ignored unless `--robots_allow_list` is also provided.
+The CLI requires an explicit `--use-robots-txt` or `--no-use-robots-txt` choice.
+`--no-use-robots-txt` requires at least one explicit `--sitemap_urls` value.
+The `--sitemap_allow_list` filter applies to robots.txt sitemap entries and sitemap indexes.
 
 ### Step 3: Script crawls all URLs in the sitemaps
 

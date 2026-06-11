@@ -1,6 +1,7 @@
 {
     "feed_id": "d38238bc-d753-5f81-9c0f-6f31a22d7d70",
     "blog_url": "https://www.aquasec.com/blog/",
+    "use_robots_txt": false,
     "sitemap_urls": [
         "https://www.aquasec.com/post-sitemap.xml"
     ],
@@ -14,5 +15,6 @@
     ],
     "omit_author": true,
     "preferred_date": "P",
-    "name": "Aqua Security"
+    "name": "Aqua Security",
+    "use_robots_txt": false
 }

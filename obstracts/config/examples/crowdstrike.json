@@ -6,5 +6,6 @@
     "path_allow_list": [
         "*/blog/how*"
     ],
-    "name": "Crowdstrike"
+    "name": "Crowdstrike",
+    "use_robots_txt": true
 }

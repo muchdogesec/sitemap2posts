@@ -17,5 +17,6 @@
         "*/2024/*"
     ],
     "remove_404_records": true,
-    "name": "Krebs on Security"
+    "name": "Krebs on Security",
+    "use_robots_txt": false
 }

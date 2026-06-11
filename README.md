@@ -15,11 +15,11 @@ sitemap2posts is designed to identify all posts for a blog, using sitemaps. It c
 ## Features
 
 - **Sitemap source selection:**
-  - Default `robots` discovery: Automatically discovers sitemaps from robots.txt
+  - `robots` discovery: Explicitly fetch sitemaps from robots.txt with `--use-robots-txt`
   - Explicit `sitemap_urls`: Directly specify sitemap URLs to crawl
-  - Mixed mode: Merge explicit sitemap URLs with robots.txt entries that match `--robots_allow_list`
+  - Mixed mode: Merge explicit sitemap URLs with robots.txt entries that match `--sitemap_allow_list` when `--use-robots-txt` is enabled
 - **Robots sitemap allow-list:**
-  - Limit robots.txt-discovered sitemaps with `--robots_allow_list`
+  - Limit robots.txt-discovered sitemaps and sitemap-index children with `--sitemap_allow_list`
   - Supports prefix and glob matching via the same matching rules used elsewhere in the tool
   - Can be combined with explicit `--sitemap_urls`
 - **Smart data extraction**
@@ -60,8 +60,9 @@ python sitemap2posts.py BLOG_URL
 ### Command-Line Options
 
 * **`blog_url`** (positional): Blog URL to extract posts from
-* **`--sitemap_urls`**: One or more sitemap URLs to crawl directly. If this is the only sitemap source option provided, robots.txt is not fetched.
-* **`--robots_allow_list`**: Allow-list patterns for sitemap URLs discovered in robots.txt. If combined with `--sitemap_urls`, the allowed robots.txt sitemaps are merged with the explicit sitemap URLs.
+* **`--sitemap_urls`**: One or more sitemap URLs to crawl directly.
+* **`--sitemap_allow_list`**: Allow-list patterns for sitemap URLs discovered in robots.txt and sitemap indexes. If combined with `--sitemap_urls` and `--use-robots-txt`, the allowed robots.txt sitemaps are merged with the explicit sitemap URLs.
+* **`--use-robots-txt` / `--no-use-robots-txt`**: Required switch that enables or disables robots.txt discovery. `--no-use-robots-txt` requires at least one `--sitemap_urls` value.
 * **`--output`**: Output JSON file name (default: `sitemap_posts.json`)
 * **`--lastmod_min`**: Filter URLs with lastmod date on or after this date (format: `YYYY-MM-DD`)
 * **`--path_ignore_list`**: Path patterns to ignore. Supports glob patterns (`*`, `?`, `[...]`). Examples: `/blog/author`, `*/tag/*`, `https://example.com/*/archive`
@@ -73,32 +74,38 @@ python sitemap2posts.py BLOG_URL
 
 The sitemap source rules are:
 
-* No `--sitemap_urls` and no `--robots_allow_list`: crawl all sitemaps from robots.txt
-* No `--sitemap_urls` and `--robots_allow_list`: crawl only the robots.txt sitemaps that match the allow-list
-* `--sitemap_urls` and no `--robots_allow_list`: crawl only the explicit sitemap URLs
-* `--sitemap_urls` and `--robots_allow_list`: crawl the explicit sitemap URLs plus the robots.txt sitemaps that match the allow-list
+* `--use-robots-txt`: crawl sitemaps from robots.txt
+* `--use-robots-txt` with no `--sitemap_urls` and no `--sitemap_allow_list`: crawl all sitemaps from robots.txt
+* `--use-robots-txt` with no `--sitemap_urls` and `--sitemap_allow_list`: crawl only the robots.txt sitemaps that match the allow-list
+* `--use-robots-txt` with `--sitemap_urls` and `--sitemap_allow_list`: crawl the explicit sitemap URLs plus the robots.txt sitemaps that match the allow-list
+* `--no-use-robots-txt` with `--sitemap_urls`: crawl only the explicit sitemap URLs
+* `--no-use-robots-txt` without `--sitemap_urls`: invalid
 
 ### Examples
 
 ```shell
 # Crawl all robots.txt sitemaps
 python sitemap2posts.py https://www.crowdstrike.com/blog/ \
+  --use-robots-txt \
   --output crowdstrike_blog.json
 
 # Crawl only robots.txt sitemaps that match a pattern
 python sitemap2posts.py https://www.crowdstrike.com/blog/ \
-  --robots_allow_list 'https://www.crowdstrike.com/*-sitemap.xml' \
+  --use-robots-txt \
+  --sitemap_allow_list 'https://www.crowdstrike.com/*-sitemap.xml' \
   --output crowdstrike_blog.json
 
 # Crawl explicit sitemap URLs only
 python sitemap2posts.py https://www.crowdstrike.com/blog/ \
   --sitemap_urls https://www.crowdstrike.com/post-sitemap.xml https://www.crowdstrike.com/post-sitemap2.xml \
+  --no-use-robots-txt \
   --output crowdstrike_blog.json
 
 # Merge explicit sitemap URLs with allow-listed robots.txt sitemap URLs
 python sitemap2posts.py https://www.crowdstrike.com/blog/ \
   --sitemap_urls https://www.crowdstrike.com/post-sitemap.xml \
-  --robots_allow_list 'https://www.crowdstrike.com/*-sitemap.xml' \
+  --use-robots-txt \
+  --sitemap_allow_list 'https://www.crowdstrike.com/*-sitemap.xml' \
   --output crowdstrike_blog.json
 ```
 
