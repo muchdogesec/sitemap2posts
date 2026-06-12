@@ -250,6 +250,36 @@ python3 sitemap2posts.py https://www.hackerone.com/blog/ \
     --output obstracts/output/hackerone_blog.json
 ```
 
+### certik
+
+```shell
+python3 sitemap2posts.py https://www.certik.com/blog/ \
+    --sitemap_urls https://www.certik.com/sitemap.xml \
+    --remove_404_records \
+    --use-robots-txt \
+    --output obstracts/output/certik_blog.json
+```
+
+### cyble
+
+```shell
+python3 sitemap2posts.py https://cyble.com/blog/ \
+    --sitemap_urls https://cyble.com/post-sitemap1.xml https://cyble.com/post-sitemap2.xml https://cyble.com/post-sitemap3.xml \
+    --remove_404_records \
+    --use-robots-txt \
+    --output obstracts/output/cyble_blog.json
+```
+
+### inforisktoday
+
+```shell
+python3 sitemap2posts.pyhttp://www.inforisktoday.com/ \
+    --sitemap_urls https://www.inforisktoday.com/articles-sitemap1.xml https://www.inforisktoday.com/articles-sitemap2.xml \
+    --remove_404_records \
+    --no-use-robots-txt \
+    --output obstracts/output/inforisktoday_blog.json
+```
+
 ---
 
 ## Issues
