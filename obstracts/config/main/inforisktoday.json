@@ -1,0 +1,23 @@
+{
+    "feed_id": "3f4e57f9-c4d1-5937-9dcf-fc9a1794efe3",
+    "blog_url": "https://www.inforisktoday.com/",
+    "use_robots_txt": false,
+    "sitemap_urls": [
+        "https://www.inforisktoday.com/sitemap.xml"
+    ],
+    "sitemap_allow_list": [
+        "https://www.inforisktoday.com/latest-news*",
+        "https://www.inforisktoday.com/articles*"
+    ],
+    "profile_id": "a8c00d89-b71e-51b7-84a6-fec3c5bdf7f6",
+    "remove_404_records": true,
+    "path_allow_list": [
+        "https://www.inforisktoday.com/*"
+    ],
+    "path_ignore_list": [
+        "https://www.inforisktoday.com/"
+    ],
+    "omit_author": true,
+    "preferred_date": "H",
+    "name": "InfoRiskToday"
+}
