@@ -1,0 +1,23 @@
+{
+    "feed_id": "c5498c79-8f51-588d-bf66-8504a033b6d0",
+    "blog_url": "https://www.govinfosecurity.com/",
+    "use_robots_txt": false,
+    "sitemap_urls": [
+        "https://www.govinfosecurity.com/sitemap.xml"
+    ],
+    "sitemap_allow_list": [
+        "https://www.govinfosecurity.com/latest-news*",
+        "https://www.govinfosecurity.com/articles*"
+    ],
+    "profile_id": "a8c00d89-b71e-51b7-84a6-fec3c5bdf7f6",
+    "remove_404_records": true,
+    "path_allow_list": [
+        "https://www.govinfosecurity.com/*"
+    ],
+    "path_ignore_list": [
+        "https://www.govinfosecurity.com/"
+    ],
+    "omit_author": true,
+    "preferred_date": "H",
+    "name": "GovInfoSecurity"
+}
