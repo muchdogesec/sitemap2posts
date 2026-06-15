@@ -290,6 +290,16 @@ python3 sitemap2posts.py http://www.govinfosecurity.com/ \
     --output obstracts/output/govinfosecurity_blog.json
 ```
 
+### malware patrol
+
+```shell
+python3 sitemap2posts.py https://www.malwarepatrol.net/ \
+    --sitemap_urls https://www.malwarepatrol.net/post-sitemap.xml \
+    --remove_404_records \
+    --no-use-robots-txt \
+    --output obstracts/output/malwarepatrol_blog.json
+```
+
 ---
 
 ## Issues
