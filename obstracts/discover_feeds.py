@@ -15,7 +15,7 @@ import argparse
 
 def discover_feed_configs(
     base_dir: Path, include_dirs: List[str] = None, filter_stems: List[str] = None
-) -> List[Dict[str, Any]]:
+) -> tuple[List[Dict[str, Any]], List[tuple[str, str]]]:
     """
     Discover all feed configuration files.
 
@@ -31,6 +31,7 @@ def discover_feed_configs(
         include_dirs = ["main", "issues"]
 
     feeds = []
+    bad_feeds = []
     cwd = Path.cwd()
 
     for dir_name in include_dirs:
@@ -71,9 +72,10 @@ def discover_feed_configs(
 
             except (json.JSONDecodeError, IOError) as e:
                 print(f"Warning: Failed to read {config_file}: {e}", file=sys.stderr)
+                bad_feeds.append((config_file, f"`{type(e).__name__}`: {e}"))
                 continue
 
-    return feeds
+    return feeds, bad_feeds
 
 
 def generate_simple_matrix(feeds: List[Dict[str, Any]]) -> Dict[str, Any]:
@@ -219,7 +221,7 @@ Examples:
     args = parser.parse_args()
 
     # Discover feeds
-    feeds = discover_feed_configs(args.base_dir, args.include, args.filter)
+    feeds, bad_feeds = discover_feed_configs(args.base_dir, args.include, args.filter)
 
     if not feeds:
         if args.filter:
@@ -241,6 +243,7 @@ Examples:
             print(f"     URL: {feed['blog_url']}")
             print(f"     Category: {feed['category']}")
             print()
+        print_and_exit_if_bad_config(bad_feeds, as_markdown=False)
         return
 
     # Markdown mode
@@ -256,6 +259,7 @@ Examples:
             category = feed['category']
             config_path = feed['config_path'].replace('|', '\\|')
             print(f"| {name} | `{feed_id_short}` | {url} | {category} | `{config_path}` |")
+        print_and_exit_if_bad_config(bad_feeds, as_markdown=True)
         return
 
     # Generate matrix
@@ -274,6 +278,24 @@ Examples:
     else:
         # Plain JSON
         print(matrix_json)
+
+def print_and_exit_if_bad_config(feeds, as_markdown=False):
+    if not feeds:
+        return
+    if as_markdown:
+        print("\n\n")
+        print("# Feeds that failed initial validation")
+        print("| Name | Config Path | Error |")
+        print("|------|-------------|-------|")
+        for config_path, error in feeds:
+            # Escape pipe characters in fields
+            name = Path(config_path).stem
+            print(f"| {name} | `{config_path}` | {error} |")
+    else:
+        print(len(feeds), "configs failed validation:")
+        for config_path, error in feeds:
+            print(f"- parse {config_path} failed with error: {error}")
+    sys.exit(27)
 
 
 if __name__ == "__main__":
