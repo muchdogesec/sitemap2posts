@@ -1,7 +1,10 @@
 {
     "feed_id": "dcb31053-0a55-5fcd-ba0e-975cdae7dce8",
     "blog_url": "https://www.zscaler.com/blogs/security-research/",
-    "use_robots_txt": true,
+    "use_robots_txt": false,
+    "sitemap_urls": [
+        "https://www.zscaler.com/sitemap.xml"
+    ],
     "sitemap_allow_list": [
         "https://www.zscaler.com/sitemap.xml"
     ],
