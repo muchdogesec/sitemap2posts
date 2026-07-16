@@ -63,7 +63,7 @@ jobs:
       matrix: ${{ fromJson(needs.discover-feeds.outputs.matrix) }}
     concurrency:
       group: ${{ matrix.config_path }}
-      cancel-in-progress: true
+      cancel-in-progress: false
 
     steps:
       - name: Checkout repository
