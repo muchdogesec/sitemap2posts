@@ -1,10 +1,7 @@
 {
     "feed_id": "4d944236-3671-5881-a3bd-ae37c766406f",
     "blog_url": "https://securityscorecard.com/blog/",
-    "use_robots_txt": false,
-    "sitemap_urls": [
-        "https://securityscorecard.com/sitemap_index.xml"
-    ],
+    "use_robots_txt": true,
     "sitemap_allow_list": [
         "https://securityscorecard.com/resources-sitemap*"
     ],
