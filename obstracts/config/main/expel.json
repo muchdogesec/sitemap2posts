@@ -1,8 +1,8 @@
 {
     "feed_id": "57f65a6f-fb84-5fd7-ba2b-6623322224fb",
     "blog_url": "https://expel.com/blog/",
-    "use_robots_txt": true,
-    "sitemap_allow_list": [
+    "use_robots_txt": false,
+    "sitemap_urls": [
         "https://expel.com/post-sitemap.xml"
     ],
     "profile_id": "a8c00d89-b71e-51b7-84a6-fec3c5bdf7f6",

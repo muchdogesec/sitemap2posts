@@ -1,7 +1,10 @@
 {
     "feed_id": "39740aa2-052e-53ca-ad1e-32d10b79cc63",
     "blog_url": "https://www.dragos.com/blog/",
-    "use_robots_txt": true,
+    "use_robots_txt": false,
+    "sitemap_urls": [
+        "https://www.dragos.com/sitemap.xml"
+    ],
     "sitemap_allow_list": [
         "https://www.dragos.com/sitemap-*"
     ],
