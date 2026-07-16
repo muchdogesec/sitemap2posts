@@ -1,7 +1,10 @@
 {
     "feed_id": "e38cba84-e9ab-5b7b-98cb-65463a7e8c42",
     "blog_url": "https://cyble.com/blog/",
-    "use_robots_txt": true,
+    "use_robots_txt": false,
+    "sitemap_urls": [
+        "https://cyble.com/sitemap_index.xml"
+    ],
     "sitemap_allow_list": [
         "https://cyble.com/post-sitemap*"
     ],
