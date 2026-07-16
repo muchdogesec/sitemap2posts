@@ -371,7 +371,7 @@ def fetch_post_titles(urls, remove_404_records=False):
 
 
 def crawl_sitemaps(
-    sitemap_urls, ignore_sitemaps=None, sitemap_allow_list=None, crawled=None
+    sitemap_urls, crawled=None
 ):
     crawled = crawled or set()
     retval = set()
@@ -384,8 +384,6 @@ def crawl_sitemaps(
             retval.update(
                 crawl_sitemaps(
                     posts_or_sitemaps,
-                    ignore_sitemaps,
-                    sitemap_allow_list=sitemap_allow_list,
                     crawled=crawled,
                 )
             )
@@ -435,7 +433,7 @@ def sitemap2posts(
         sitemap_urls.extend(robots_sitemaps)
 
     all_sitemaps = list(
-        crawl_sitemaps(sitemap_urls, ignore_sitemaps, sitemap_allow_list)
+        crawl_sitemaps(sitemap_urls)
     )
     logging.info(f"Total sitemaps found after crawling: {len(all_sitemaps)}")
     filtered_sitemaps = []
