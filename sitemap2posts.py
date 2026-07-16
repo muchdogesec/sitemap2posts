@@ -79,9 +79,10 @@ def get_sitemaps_from_robots(url, sitemap_allow_list=None):
     response = fetch_url(robots_url)
 
     if not response.ok:
-        raise FetchSitemapError(
+        logging.error(
             f"Failed to fetch robots.txt from {robots_url}: {response.status_code} {response.reason}"
         )
+        return []
 
     logging.info("Successfully fetched robots.txt")
     sitemaps = re.findall(r"Sitemap: (.*)", response.text, re.IGNORECASE)

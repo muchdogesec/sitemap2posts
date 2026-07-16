@@ -74,6 +74,13 @@ class GitHubActionsOutput:
 class JobCreationFailed(Exception):
     pass
 
+
+def format_exception_message(error: Exception) -> str:
+    message = str(error)
+    if message:
+        return f"{type(error).__name__}: {message}"
+    return type(error).__name__
+
 @contextlib.contextmanager
 def log_collapsed(title: str):
     """Context manager for collapsible log sections in GitHub Actions."""
@@ -283,12 +290,14 @@ class ObstractsAPIClient:
 
         # Determine overall success
         success = all(job.get("state") in ["processed", "skipped"] for job in all_jobs)
+        error = next((job.get("error") for job in all_jobs if job.get("error")), None)
 
         return {
             "feed_id": feed_id,
             "posts_count": total_posts,
             "jobs": all_jobs,
             "success": success,
+            "error": error,
             "submitted_posts": total_submitted,
             "failed_posts": all_failed_posts,
         }
@@ -729,7 +738,19 @@ def sync_feeds(config_path: str, posts_per_job: Optional[int] = None):
     gh_output.add_summary("---\n")
 
     # Process the feed
-    result = process_feed(feed_config, api_client, posts_per_job)
+    try:
+        result = process_feed(feed_config, api_client, posts_per_job)
+    except Exception as e:
+        logging.exception(f"Feed {feed_id}: Sync failed")
+        result = {
+            "feed_id": feed_id,
+            "posts_count": 0,
+            "job_id": None,
+            "success": False,
+            "error": format_exception_message(e),
+            "jobs": [],
+            "submitted_posts": 0,
+        }
 
     total_posts = result["posts_count"]
     submitted_posts = result.get("submitted_posts", 0)
