@@ -240,8 +240,8 @@ def should_skip_sitemap(sitemap, ignore_list, allow_list):
     if ignore_list and sitemap in ignore_list:
         logging.info(f"Skipping sitemap {sitemap} as per ignore_list")
         return True
-    if allow_list and any(url_matches_pattern(sitemap, pattern) for pattern in allow_list):
-        logging.info(f"Skipping sitemap {sitemap} as it matches allow_list")
+    if allow_list and not any(url_matches_pattern(sitemap, pattern) for pattern in allow_list):
+        logging.info(f"Skipping sitemap {sitemap} as it doesn't match allow_list")
         return True
     return False
 
@@ -442,8 +442,6 @@ def sitemap2posts(
     for sitemap in all_sitemaps:
         if not should_skip_sitemap(sitemap, ignore_sitemaps, sitemap_allow_list):
             filtered_sitemaps.append(sitemap)
-        else:
-            logging.info(f"Skipping sitemap {sitemap} due to ignore/allow list")
     logging.info(f"Total sitemaps after filtering: {len(filtered_sitemaps)}")
 
     if not filtered_sitemaps:
