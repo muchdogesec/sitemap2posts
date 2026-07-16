@@ -329,12 +329,17 @@ class ObstractsAPIClient:
             error_data = response.json().get("details", {})
             if not isinstance(error_data.get("posts"), dict):
                 raise JobCreationFailed(error_data)
+            is_true_fail = False
             for index, error in error_data["posts"].items():
                 index = int(index)
                 post = posts[index]
                 failed_posts.append(
                     {"url": post.pop("link"), "errors": error, "meta": post}
                 )
+                if "already exists" not in str(error):
+                    is_true_fail = True
+            if is_true_fail:
+                raise JobCreationFailed(error_data)
             i = 0
             while i < len(posts):
                 post = posts[i]
@@ -504,7 +509,7 @@ def prepare_post_data(post: Dict, omit_author: bool) -> Dict:
     if not omit_author and "authors" in post:
         data["author"] = post["authors"]
     if "tags" in post:
-        data["categories"] = post["tags"]
+        data["categories"] = post["tags"][:32]  # Limit to 32 categories
     return data
 
 
