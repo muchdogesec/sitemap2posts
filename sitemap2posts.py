@@ -22,6 +22,7 @@ lastmod_default = datetime.now(timezone.utc)
 
 # Save the original default method
 JSONEncoder_olddefault = json.JSONEncoder.default
+DEFAULT_TIMEOUT = 10
 
 
 # Define the new default method
@@ -45,7 +46,7 @@ def make_dt_utc(dt: datetime) -> datetime:
     return dt.astimezone(timezone.utc)
 
 
-def fetch_url(url, timeout=10):
+def fetch_url(url, timeout=DEFAULT_TIMEOUT):
     """Fetch URL with error handling."""
     try:
         response = requests.get(

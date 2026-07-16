@@ -58,6 +58,7 @@ jobs:
     name: Sync Feeds for `${{ matrix.name }}`
     needs: discover-feeds
     strategy:
+      fail-fast: false
       max-parallel: 2
       matrix: ${{ fromJson(needs.discover-feeds.outputs.matrix) }}
     concurrency:
