@@ -1,7 +1,10 @@
 {
     "feed_id": "6570f61e-62d2-5ee9-a8ec-f417200f5dc0",
     "blog_url": "https://www.darknet.org.uk/",
-    "use_robots_txt": true,
+    "use_robots_txt": false,
+    "sitemap_urls": [
+        "https://www.darknet.org.uk/sitemaps.xml"
+    ],
     "sitemap_allow_list": [
         "https://www.darknet.org.uk/post-sitemap*"
     ],
