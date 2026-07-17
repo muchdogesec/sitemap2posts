@@ -112,7 +112,7 @@ class ObstractsAPIClient:
         )
 
     def wait_for_job(
-        self, job_id: str, poll_interval: int = 5, timeout: int = 600
+        self, job_id: str, poll_interval: int = 5, timeout: int = 1200
     ) -> Dict:
         """
         Wait for a job to complete by polling its status.
@@ -120,7 +120,7 @@ class ObstractsAPIClient:
         Args:
             job_id: The ID of the job to wait for
             poll_interval: Seconds between status checks (default: 5)
-            timeout: Maximum time to wait in seconds (default: 600)
+            timeout: Maximum time to wait in seconds (default: 1200)
 
         Returns:
             Job details dictionary

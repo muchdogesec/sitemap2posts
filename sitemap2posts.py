@@ -24,7 +24,7 @@ lastmod_default = datetime.now(timezone.utc)
 
 # Save the original default method
 JSONEncoder_olddefault = json.JSONEncoder.default
-DEFAULT_TIMEOUT = 10
+DEFAULT_TIMEOUT = 20
 
 
 # Define the new default method
