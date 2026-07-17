@@ -1,3 +1,5 @@
+from functools import lru_cache
+
 import requests
 from bs4 import BeautifulSoup
 import json
@@ -22,6 +24,7 @@ lastmod_default = datetime.now(timezone.utc)
 
 # Save the original default method
 JSONEncoder_olddefault = json.JSONEncoder.default
+DEFAULT_TIMEOUT = 20
 
 
 # Define the new default method
@@ -38,6 +41,12 @@ def JSONEncoder_newdefault(self, obj):
 json.JSONEncoder.default = JSONEncoder_newdefault
 
 
+class FetchSitemapError(Exception):
+    """Custom exception for errors when fetching sitemaps."""
+
+    pass
+
+
 def make_dt_utc(dt: datetime) -> datetime:
     """Convert a datetime to UTC if it is naive."""
     if dt.tzinfo is None:
@@ -45,7 +54,7 @@ def make_dt_utc(dt: datetime) -> datetime:
     return dt.astimezone(timezone.utc)
 
 
-def fetch_url(url, timeout=10):
+def fetch_url(url, timeout=DEFAULT_TIMEOUT):
     """Fetch URL with error handling."""
     try:
         response = requests.get(
@@ -58,8 +67,7 @@ def fetch_url(url, timeout=10):
 
         return response
     except requests.RequestException as e:
-        logging.error(f"Error fetching {url}: {e}")
-        return None
+        raise RuntimeError(f"Error fetching {url}") from e
 
 
 def get_sitemaps_from_robots(url, sitemap_allow_list=None):
@@ -72,8 +80,10 @@ def get_sitemaps_from_robots(url, sitemap_allow_list=None):
     robots_url = urljoin(url, "/robots.txt")
     response = fetch_url(robots_url)
 
-    if not response or not response.ok:
-        logging.error(f"Failed to fetch robots.txt from {robots_url}")
+    if not response.ok:
+        logging.error(
+            f"Failed to fetch robots.txt from {robots_url}: {response.status_code} {response.reason}"
+        )
         return []
 
     logging.info("Successfully fetched robots.txt")
@@ -83,27 +93,10 @@ def get_sitemaps_from_robots(url, sitemap_allow_list=None):
         logging.error("No sitemaps found in robots.txt.")
     else:
         logging.info(f"Found {len(sitemaps)} sitemap(s) in robots.txt")
-
-    if sitemap_allow_list:
-        logging.info("Applying --sitemap_allow_list filter (supports glob patterns)")
-        before_filter_count = len(sitemaps)
-        sitemaps = [
-            sitemap
-            for sitemap in sitemaps
-            if any(
-                url_matches_pattern(sitemap, pattern)
-                for pattern in sitemap_allow_list
-            )
-        ]
-        logging.info(
-            f"{len(sitemaps)} sitemap(s) remain after applying --sitemap_allow_list filter"
-        )
-        if before_filter_count and not sitemaps:
-            logging.warning("No robots.txt sitemap entries matched --sitemap_allow_list")
-
     return sitemaps
 
 
+@lru_cache(maxsize=None)
 def parse_sitemap_content(soup, sitemap_url):
     """Parse sitemap XML content and return URLs with type indicator."""
     if soup.find("sitemapindex"):
@@ -134,10 +127,10 @@ def get_sitemap_urls(sitemap_url):
     logging.info(f"Fetching sitemap from {sitemap_url}")
     response = fetch_url(sitemap_url)
 
-    if not response or not response.ok:
-        reason = response.reason if response is not None else "No response"
-        logging.error(f"Failed to fetch sitemap from {sitemap_url}: {reason}")
-        return [], False
+    if not response.ok:
+        raise FetchSitemapError(
+            f"Failed to fetch sitemap from {sitemap_url}: {response.status_code} {response.reason}"
+        )
 
     soup = BeautifulSoup(response.content, "lxml-xml")
     return parse_sitemap_content(soup, sitemap_url)
@@ -184,8 +177,9 @@ def get_post_title(url, check_404=False):
         return None, False
 
     if response.status_code != 200:
-        logging.debug(f"Failed to fetch URL {url}")
-        return None, False
+        raise RuntimeError(
+            f"Failed to fetch URL {url}: {response.status_code} {response.reason}"
+        )
 
     article = Article(url)
     article.download(input_html=response.text)
@@ -230,7 +224,7 @@ def save_to_json(posts, output_filename="sitemap_posts.json"):
             json.dump(sorted_posts, jsonfile, indent=4)
         logging.info(f"JSON saved successfully with {len(posts)} post(s)")
     except IOError as e:
-        logging.error(f"Failed to save JSON to {output_filename}: {e}")
+        raise RuntimeError(f"Failed to save JSON to {output_filename}") from e
 
 
 def is_date_after_min(lastmod_parsed, lastmod_min):
@@ -241,64 +235,24 @@ def is_date_after_min(lastmod_parsed, lastmod_min):
     return lastmod_parsed >= lastmod_min
 
 
-def should_skip_sitemap(sitemap, ignore_sitemaps):
+def should_skip_sitemap(sitemap, ignore_list, allow_list):
     """Check if a sitemap should be skipped."""
-    if ignore_sitemaps and sitemap in ignore_sitemaps:
-        logging.info(f"Skipping sitemap {sitemap} as per ignore_sitemaps")
+    if ignore_list and sitemap in ignore_list:
+        logging.info(f"Skipping sitemap {sitemap} as per ignore_list")
+        return True
+    if allow_list and not any(url_matches_pattern(sitemap, pattern) for pattern in allow_list):
+        logging.info(f"Skipping sitemap {sitemap} as it doesn't match allow_list")
         return True
     return False
 
-
-def sitemap_matches_allow_list(sitemap, sitemap_allow_list):
-    """Check whether a sitemap matches the allow-list, if one is set."""
-    if not sitemap_allow_list:
-        return True
-
-    return any(
-        url_matches_pattern(sitemap, pattern) for pattern in sitemap_allow_list
-    )
-
-
-def collect_urls_from_sitemap(sitemap, ignore_sitemaps, sitemap_allow_list=None):
-    """Collect all URLs from a sitemap or sitemap index."""
-    if should_skip_sitemap(sitemap, ignore_sitemaps):
-        return []
-
-    urls, is_sitemap_index = get_sitemap_urls(sitemap)
-
-    if is_sitemap_index:
-        all_urls = []
-        for sub_sitemap in urls:
-            if should_skip_sitemap(sub_sitemap, ignore_sitemaps):
-                continue
-            if not sitemap_matches_allow_list(sub_sitemap, sitemap_allow_list):
-                logging.info(
-                    f"Skipping sitemap {sub_sitemap} as it does not match --sitemap_allow_list"
-                )
-                continue
-            all_urls.extend(
-                collect_urls_from_sitemap(
-                    sub_sitemap,
-                    ignore_sitemaps,
-                    sitemap_allow_list=sitemap_allow_list,
-                )
-            )
-        return all_urls
-
-    return [(url, lastmod, sitemap) for url, lastmod in urls]
-
-
-def collect_urls_from_sitemaps(sitemaps, ignore_sitemaps, sitemap_allow_list=None):
+def collect_urls_from_sitemaps(sitemaps):
     """Collect all URLs from a list of sitemaps."""
     all_urls = []
 
     for sitemap in sitemaps:
-        all_urls.extend(
-            collect_urls_from_sitemap(
-                sitemap, ignore_sitemaps, sitemap_allow_list=sitemap_allow_list
-            )
-        )
-
+        urls, _ = get_sitemap_urls(sitemap)
+        for url, lastmod in urls:
+            all_urls.append((url, lastmod, sitemap))
     return all_urls
 
 
@@ -324,8 +278,10 @@ def filter_urls_by_base(urls, base_url):
     """Filter URLs to only include those starting with base URL."""
     return {url: data for url, data in urls.items() if url.startswith(base_url)}
 
+
 def url_matches_pattern(url, pattern):
     return fnmatch(url, pattern)
+
 
 def filter_urls_by_paths(urls, ignore_paths=None, allow_paths=None):
     """Filter URLs based on ignore and allow path lists (supports glob patterns)."""
@@ -414,6 +370,28 @@ def fetch_post_titles(urls, remove_404_records=False):
     return posts
 
 
+def crawl_sitemaps(
+    sitemap_urls, crawled=None
+):
+    crawled = crawled or set()
+    retval = set()
+    for sitemap in sitemap_urls:
+        if sitemap in crawled:
+            continue
+        crawled.add(sitemap)
+        posts_or_sitemaps, is_sitemap_index = get_sitemap_urls(sitemap)
+        if is_sitemap_index:
+            retval.update(
+                crawl_sitemaps(
+                    posts_or_sitemaps,
+                    crawled=crawled,
+                )
+            )
+        else:
+            retval.add(sitemap)
+    return retval
+
+
 def sitemap2posts(
     blog_url,
     sitemap_urls=None,
@@ -429,7 +407,11 @@ def sitemap2posts(
 ):
     """Main function to crawl sitemaps and extract post information."""
     if sitemap_allow_list is None:
-        sitemap_allow_list = robots_allow_list if robots_allow_list is not None else robots_sitemap_allow_list
+        sitemap_allow_list = (
+            robots_allow_list
+            if robots_allow_list is not None
+            else robots_sitemap_allow_list
+        )
 
     sitemap_urls = list(dict.fromkeys(sitemap_urls or []))
 
@@ -448,27 +430,31 @@ def sitemap2posts(
         else:
             logging.info("Using sitemaps from robots.txt")
         robots_sitemaps = get_sitemaps_from_robots(blog_url, sitemap_allow_list)
-        sitemap_urls = list(dict.fromkeys([*sitemap_urls, *robots_sitemaps]))
+        sitemap_urls.extend(robots_sitemaps)
 
-    if not sitemap_urls:
+    all_sitemaps = list(
+        crawl_sitemaps(sitemap_urls)
+    )
+    logging.info(f"Total sitemaps found after crawling: {len(all_sitemaps)}")
+    filtered_sitemaps = []
+    for sitemap in all_sitemaps:
+        if not should_skip_sitemap(sitemap, ignore_sitemaps, sitemap_allow_list):
+            filtered_sitemaps.append(sitemap)
+    logging.info(f"Total sitemaps after filtering: {len(filtered_sitemaps)}")
+
+    if not filtered_sitemaps:
+        exc_msg = ""
         if not use_robots_txt:
-            logging.error(
-                "No sitemap URLs were provided and --use-robots-txt is disabled."
-            )
+            exc_msg = "No sitemap URLs were provided and --use-robots-txt is disabled."
         elif sitemap_allow_list:
-            logging.error(
-                "No sitemaps are defined in this website's robots.txt file that match --sitemap_allow_list, so it cannot be crawled."
-            )
+            exc_msg = "No sitemaps are defined in this website's robots.txt file that match --sitemap_allow_list, so it cannot be crawled."
         else:
-            logging.error(
-                "No sitemaps are defined in this website's robots.txt file, so it cannot be crawled."
-            )
-        return []
+            exc_msg = "No sitemaps are defined in this website's robots.txt file, so it cannot be crawled."
+        logging.error(exc_msg)
+        raise FetchSitemapError(exc_msg)
 
     # Collect URLs from all sitemaps
-    all_urls = collect_urls_from_sitemaps(
-        sitemap_urls, ignore_sitemaps, sitemap_allow_list=sitemap_allow_list
-    )
+    all_urls = collect_urls_from_sitemaps(filtered_sitemaps)
 
     # Deduplicate URLs
     deduped_urls = dedupe_urls(all_urls)
@@ -483,7 +469,7 @@ def sitemap2posts(
     if not filtered_urls:
         logging.warning("No URLs to process after applying filters.")
         return []
-
+    
     # Fetch post titles (404 check is done during fetch if remove_404_records is True)
     posts = fetch_post_titles(filtered_urls, remove_404_records)
 
@@ -584,6 +570,7 @@ def parse_cli_arguments():
         parser.error("--no-use-robots-txt requires at least one --sitemap_urls value")
 
     return args
+
 
 if __name__ == "__main__":
     args = parse_cli_arguments()

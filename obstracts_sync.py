@@ -74,6 +74,13 @@ class GitHubActionsOutput:
 class JobCreationFailed(Exception):
     pass
 
+
+def format_exception_message(error: Exception) -> str:
+    message = str(error)
+    if message:
+        return f"{type(error).__name__}: {message}"
+    return type(error).__name__
+
 @contextlib.contextmanager
 def log_collapsed(title: str):
     """Context manager for collapsible log sections in GitHub Actions."""
@@ -105,7 +112,7 @@ class ObstractsAPIClient:
         )
 
     def wait_for_job(
-        self, job_id: str, poll_interval: int = 5, timeout: int = 600
+        self, job_id: str, poll_interval: int = 5, timeout: int = 1200
     ) -> Dict:
         """
         Wait for a job to complete by polling its status.
@@ -113,7 +120,7 @@ class ObstractsAPIClient:
         Args:
             job_id: The ID of the job to wait for
             poll_interval: Seconds between status checks (default: 5)
-            timeout: Maximum time to wait in seconds (default: 600)
+            timeout: Maximum time to wait in seconds (default: 1200)
 
         Returns:
             Job details dictionary
@@ -283,12 +290,14 @@ class ObstractsAPIClient:
 
         # Determine overall success
         success = all(job.get("state") in ["processed", "skipped"] for job in all_jobs)
+        error = next((job.get("error") for job in all_jobs if job.get("error")), None)
 
         return {
             "feed_id": feed_id,
             "posts_count": total_posts,
             "jobs": all_jobs,
             "success": success,
+            "error": error,
             "submitted_posts": total_submitted,
             "failed_posts": all_failed_posts,
         }
@@ -320,12 +329,17 @@ class ObstractsAPIClient:
             error_data = response.json().get("details", {})
             if not isinstance(error_data.get("posts"), dict):
                 raise JobCreationFailed(error_data)
+            is_true_fail = False
             for index, error in error_data["posts"].items():
                 index = int(index)
                 post = posts[index]
                 failed_posts.append(
                     {"url": post.pop("link"), "errors": error, "meta": post}
                 )
+                if "already exists" not in str(error):
+                    is_true_fail = True
+            if is_true_fail:
+                raise JobCreationFailed(error_data)
             i = 0
             while i < len(posts):
                 post = posts[i]
@@ -495,7 +509,7 @@ def prepare_post_data(post: Dict, omit_author: bool) -> Dict:
     if not omit_author and "authors" in post:
         data["author"] = post["authors"]
     if "tags" in post:
-        data["categories"] = post["tags"]
+        data["categories"] = post["tags"][:32]  # Limit to 32 categories
     return data
 
 
@@ -729,7 +743,19 @@ def sync_feeds(config_path: str, posts_per_job: Optional[int] = None):
     gh_output.add_summary("---\n")
 
     # Process the feed
-    result = process_feed(feed_config, api_client, posts_per_job)
+    try:
+        result = process_feed(feed_config, api_client, posts_per_job)
+    except Exception as e:
+        logging.exception(f"Feed {feed_id}: Sync failed")
+        result = {
+            "feed_id": feed_id,
+            "posts_count": 0,
+            "job_id": None,
+            "success": False,
+            "error": format_exception_message(e),
+            "jobs": [],
+            "submitted_posts": 0,
+        }
 
     total_posts = result["posts_count"]
     submitted_posts = result.get("submitted_posts", 0)
