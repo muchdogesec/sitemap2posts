@@ -300,6 +300,18 @@ python3 sitemap2posts.py https://www.malwarepatrol.net/ \
     --output obstracts/output/malwarepatrol_blog.json
 ```
 
+### Sekoia (`9cacd949-ea55-5922-b8ac-f4a86ce8242b`)
+
+
+```shell
+python3 sitemap2posts.py https://www.sekoia.com/blog/ \
+    --sitemap_urls https://www.sekoia.com/sitemap.xml \
+    --remove_404_records \
+    --no-use-robots-txt \
+    --output obstracts/output/sekoia_blog.json
+```
+
+
 ---
 
 ## Issues
