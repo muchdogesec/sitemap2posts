@@ -274,11 +274,6 @@ def filter_urls_by_lastmod(urls, lastmod_min):
     return filtered
 
 
-def filter_urls_by_base(urls, base_url):
-    """Filter URLs to only include those starting with base URL."""
-    return {url: data for url, data in urls.items() if url.startswith(base_url)}
-
-
 def url_matches_pattern(url, pattern):
     return fnmatch(url, pattern)
 
@@ -460,8 +455,7 @@ def sitemap2posts(
     deduped_urls = dedupe_urls(all_urls)
 
     # Apply filters
-    filtered_urls = filter_urls_by_base(deduped_urls, blog_url)
-    filtered_urls = filter_urls_by_lastmod(filtered_urls, lastmod_min)
+    filtered_urls = filter_urls_by_lastmod(deduped_urls, lastmod_min)
     filtered_urls = filter_urls_by_paths(
         filtered_urls, path_ignore_list, path_allow_list
     )
