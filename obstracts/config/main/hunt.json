@@ -1,7 +1,7 @@
 {
     "feed_id": "98d67329-7040-5562-b5e6-876377cf6ae2",
     "blog_url": "https://hunt.io/blog/",
-    "use_robots_txt": true,
+    "use_robots_txt": false,
     "sitemap_allow_list": [
         "https://hunt.io/sitemap.xml"
     ],

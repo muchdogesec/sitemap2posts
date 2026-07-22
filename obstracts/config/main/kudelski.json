@@ -1,0 +1,19 @@
+{
+    "feed_id": "b9fa8372-0ceb-516e-8124-b30110d006bb",
+    "blog_url": "https://kudelskisecurity.com/research-blog",
+    "use_robots_txt": false,
+    "sitemap_allow_list": [
+        "https://kudelskisecurity.com/sitemap.xml"
+    ],
+    "profile_id": "a8c00d89-b71e-51b7-84a6-fec3c5bdf7f6",
+    "remove_404_records": true,
+    "path_allow_list": [
+        "https://kudelskisecurity.com/research/*"
+    ],
+    "path_ignore_list": [
+        "https://kudelskisecurity.com/research/"
+    ],
+    "omit_author": true,
+    "preferred_date": "H",
+    "name": "Kudelski Security"
+}

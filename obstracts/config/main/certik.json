@@ -1,7 +1,7 @@
 {
     "feed_id": "0e7a6e3a-70a4-5e50-8877-f3a86faef336",
     "blog_url": "https://www.certik.com/blog",
-    "use_robots_txt": true,
+    "use_robots_txt": false,
     "sitemap_allow_list": [
         "https://www.certik.com/sitemap.xml"
     ],
