@@ -2,7 +2,7 @@
     "feed_id": "70dd1922-9678-5091-8ec8-22499dc4dbbf",
     "blog_url": "https://iverify.io/blog/",
     "use_robots_txt": false,
-    "sitemap_allow_list": [
+    "sitemap_urls": [
         "https://iverify.io/sitemap.xml"
     ],
     "profile_id": "a8c00d89-b71e-51b7-84a6-fec3c5bdf7f6",
