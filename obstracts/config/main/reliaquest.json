@@ -1,7 +1,7 @@
 {
     "feed_id": "fe6671dc-af3a-5dc4-9f5a-ed09378bdd0c",
     "blog_url": "https://reliaquest.com/blog/",
-    "use_robots_txt": true,
+    "use_robots_txt": false,
     "sitemap_allow_list": [
         "https://reliaquest.com/sitemap.xml"
     ],

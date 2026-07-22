@@ -1,7 +1,7 @@
 {
     "feed_id": "0e212062-1a0a-5652-919a-8d201d00ad04",
     "blog_url": "https://claroty.com/team82/research/",
-    "use_robots_txt": true,
+    "use_robots_txt": false,
     "sitemap_allow_list": [
         "https://claroty.com/sitemap.xml"
     ],
