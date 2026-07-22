@@ -19,9 +19,9 @@ python3 sitemap2posts.py https://www.halcyon.ai/blog/ \
 ## Sublime Security (`5782159d-3066-574c-8f3f-be1dd8288b65`)
 
 ```shell
-python3 sitemap2posts.py https://sublime.security/blog/ \
+python3 sitemap2posts.py https://proxied2.sublime.security/blog/ \
     --path_allow_list 'https://proxied2.sublime.security/blog/*' \
-    --sitemap_urls https://sublime.security/sitemap.xml \
+    --sitemap_urls https://proxied2.sublime.security/blog/sitemap.xml \
     --remove_404_records \
     --output obstracts/output/sublime_security_blog.json
 ```
@@ -302,7 +302,6 @@ python3 sitemap2posts.py https://www.malwarepatrol.net/ \
 
 ### Sekoia (`9cacd949-ea55-5922-b8ac-f4a86ce8242b`)
 
-
 ```shell
 python3 sitemap2posts.py https://www.sekoia.com/blog/ \
     --sitemap_urls https://www.sekoia.com/sitemap.xml \
@@ -311,6 +310,15 @@ python3 sitemap2posts.py https://www.sekoia.com/blog/ \
     --output obstracts/output/sekoia_blog.json
 ```
 
+### Kudelski Security (`b9fa8372-0ceb-516e-8124-b30110d006bb`)
+
+```shell
+python3 sitemap2posts.py https://kudelskisecurity.com/research/ \
+    --sitemap_urls https://kudelskisecurity.com/sitemap.xml \
+    --remove_404_records \
+    --no-use-robots-txt \
+    --output obstracts/output/kudelskisecurity_blog.json
+```
 
 ---
 
