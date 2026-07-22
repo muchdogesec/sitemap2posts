@@ -433,23 +433,6 @@ def validate_config(config: Dict) -> bool:
     )
     return True
 
-
-def save_config(config_path: str, config: Dict):
-    """
-    Save configuration to JSON file.
-
-    Args:
-        config_path: Path to the configuration JSON file
-        config: Configuration dictionary to save
-    """
-    try:
-        with open(config_path, "w", encoding="utf-8") as f:
-            json.dump(config, f, indent=4)
-        logging.info(f"Saved configuration to {config_path}")
-    except IOError as e:
-        logging.error(f"Failed to save configuration: {e}")
-
-
 def extract_date_from_post(post: Dict, preferred_date: str) -> Optional[datetime]:
     """
     Extract date from post based on preferred_date order.
@@ -823,12 +806,6 @@ def sync_feeds(config_path: str, posts_per_job: Optional[int] = None):
                 )
 
     gh_output.add_summary("\n")
-
-    # Clean up: Remove lastmod_min from config (it should be retrieved from server)
-    feed_config.pop("lastmod_min", None)
-
-    # Save cleaned configuration
-    save_config(config_path, feed_config)
 
     # Add summary statistics
     gh_output.add_summary("---\n")
