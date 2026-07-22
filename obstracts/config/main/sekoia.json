@@ -2,7 +2,7 @@
     "feed_id": "9cacd949-ea55-5922-b8ac-f4a86ce8242b",
     "blog_url": "https://www.sekoia.com/blog/",
     "use_robots_txt": false,
-    "sitemap_allow_list": [
+    "sitemap_urls": [
         "https://www.sekoia.com/sitemap.xml"
     ],
     "profile_id": "a8c00d89-b71e-51b7-84a6-fec3c5bdf7f6",

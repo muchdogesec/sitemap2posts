@@ -2,7 +2,7 @@
     "feed_id": "85818f22-92ff-5c68-8dc1-a9c6d6e505ec",
     "blog_url": "https://www.volexity.com/blog/",
     "use_robots_txt": false,
-    "sitemap_allow_list": [
+    "sitemap_urls": [
         "https://www.volexity.com/post-sitemap.xml"
     ],
     "profile_id": "a8c00d89-b71e-51b7-84a6-fec3c5bdf7f6",

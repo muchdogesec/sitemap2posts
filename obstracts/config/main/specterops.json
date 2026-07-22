@@ -2,7 +2,7 @@
     "feed_id": "1ae489cf-f335-57a8-b96d-c87e1cd0eb78",
     "blog_url": "https://specterops.io/blog/",
     "use_robots_txt": false,
-    "sitemap_allow_list": [
+    "sitemap_urls": [
         "https://specterops.io/post-sitemap.xml"
     ],
     "profile_id": "a8c00d89-b71e-51b7-84a6-fec3c5bdf7f6",
