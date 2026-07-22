@@ -1,17 +1,17 @@
 {
     "feed_id": "5782159d-3066-574c-8f3f-be1dd8288b65",
-    "blog_url": "https://proxied2.sublime.security/blog/",
+    "blog_url": "https://sublime.security/blog/",
     "use_robots_txt": false,
     "sitemap_urls": [
-        "https://proxied2.sublime.security/sitemap.xml"
+        "https://sublime.security/sitemap.xml"
     ],
     "profile_id": "a8c00d89-b71e-51b7-84a6-fec3c5bdf7f6",
     "remove_404_records": true,
     "path_allow_list": [
-        "https://proxied2.sublime.security/blog/*"
+        "https://sublime.security/blog/*"
     ],
     "path_ignore_list": [
-        "https://proxied2.sublime.security/blog/"
+        "https://sublime.security/blog/"
     ],
     "omit_author": true,
     "preferred_date": "H",
