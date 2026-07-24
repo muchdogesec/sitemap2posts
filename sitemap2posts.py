@@ -97,7 +97,7 @@ def get_sitemaps_from_robots(url, sitemap_allow_list=None, use_scrapfly=False):
         logging.error("No sitemaps found in robots.txt.")
     else:
         logging.info(f"Found {len(sitemaps)} sitemap(s) in robots.txt")
-    return sitemaps
+    return [s.strip() for s in sitemaps]
 
 
 @lru_cache(maxsize=None)
@@ -407,6 +407,7 @@ def sitemap2posts(
     robots_allow_list=None,
     robots_sitemap_allow_list=None,
     use_scrapfly=False,
+    **kwargs,
 ):
     """Main function to crawl sitemaps and extract post information."""
     if sitemap_allow_list is None:
