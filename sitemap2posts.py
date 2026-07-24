@@ -14,6 +14,8 @@ from newspaper import Article
 from htmldate import find_date
 from email.utils import parsedate_to_datetime
 from dateutil.parser import parse as parse_dt
+from requests.structures import CaseInsensitiveDict
+from scrapfly import fetch_with_scapfly, ScrapflyError
 
 # Set up logging
 logging.basicConfig(
@@ -54,23 +56,25 @@ def make_dt_utc(dt: datetime) -> datetime:
     return dt.astimezone(timezone.utc)
 
 
-def fetch_url(url, timeout=DEFAULT_TIMEOUT):
+def fetch_url(url, timeout=DEFAULT_TIMEOUT, use_scrapfly=False):
     """Fetch URL with error handling."""
+    headers = {
+        "User-Agent": "Sitemap2post/0.0.1 (+https://github.com/muchdogesec/sitemap2posts)"
+    }
+    if use_scrapfly:
+        try:
+            headers.pop("User-Agent", None)  # Remove User-Agent for Scrapfly
+            return fetch_with_scapfly(requests.Session(), url, headers)
+        except ScrapflyError as e:
+            raise RuntimeError(f"Error fetching {url} via scrapfly") from e
     try:
-        response = requests.get(
-            url,
-            timeout=timeout,
-            headers={
-                "User-Agent": "Sitemap2post/0.0.1 (+https://github.com/muchdogesec/sitemap2posts)"
-            },
-        )
-
+        response = requests.get(url, timeout=timeout, headers=headers)
         return response
     except requests.RequestException as e:
         raise RuntimeError(f"Error fetching {url}") from e
 
 
-def get_sitemaps_from_robots(url, sitemap_allow_list=None):
+def get_sitemaps_from_robots(url, sitemap_allow_list=None, use_scrapfly=False):
     """Extract sitemap URLs from robots.txt.
 
     If sitemap_allow_list is provided, only sitemaps matching one of the patterns
@@ -78,7 +82,7 @@ def get_sitemaps_from_robots(url, sitemap_allow_list=None):
     """
     logging.info(f"Fetching robots.txt from {url}")
     robots_url = urljoin(url, "/robots.txt")
-    response = fetch_url(robots_url)
+    response = fetch_url(robots_url, use_scrapfly=use_scrapfly)
 
     if not response.ok:
         logging.error(
@@ -93,7 +97,7 @@ def get_sitemaps_from_robots(url, sitemap_allow_list=None):
         logging.error("No sitemaps found in robots.txt.")
     else:
         logging.info(f"Found {len(sitemaps)} sitemap(s) in robots.txt")
-    return sitemaps
+    return [s.strip() for s in sitemaps]
 
 
 @lru_cache(maxsize=None)
@@ -122,10 +126,10 @@ def parse_sitemap_content(soup, sitemap_url):
     return [], False
 
 
-def get_sitemap_urls(sitemap_url):
+def get_sitemap_urls(sitemap_url, use_scrapfly=False):
     """Fetch and parse a sitemap URL."""
     logging.info(f"Fetching sitemap from {sitemap_url}")
-    response = fetch_url(sitemap_url)
+    response = fetch_url(sitemap_url, use_scrapfly=use_scrapfly)
 
     if not response.ok:
         raise FetchSitemapError(
@@ -148,18 +152,19 @@ def dedupe_urls(url_list):
     return unique_urls
 
 
-def get_post_title(url, check_404=False):
+def get_post_title(url, check_404=False, use_scrapfly=False):
     """Fetch the title of a post from its URL.
 
     Args:
         url: The URL to fetch
         check_404: If True, return None for 404 responses instead of fetching title
+        use_scrapfly: If True, fetch the URL via the Scrapfly proxy API
 
     Returns:
         Tuple of (data, is_valid) where is_valid indicates if URL is not 404
     """
     logging.debug(f"Fetching post title from {url}")
-    response = fetch_url(url)
+    response = fetch_url(url, use_scrapfly=use_scrapfly)
 
     data = dict()
 
@@ -245,12 +250,12 @@ def should_skip_sitemap(sitemap, ignore_list, allow_list):
         return True
     return False
 
-def collect_urls_from_sitemaps(sitemaps):
+def collect_urls_from_sitemaps(sitemaps, use_scrapfly=False):
     """Collect all URLs from a list of sitemaps."""
     all_urls = []
 
     for sitemap in sitemaps:
-        urls, _ = get_sitemap_urls(sitemap)
+        urls, _ = get_sitemap_urls(sitemap, use_scrapfly=use_scrapfly)
         for url, lastmod in urls:
             all_urls.append((url, lastmod, sitemap))
     return all_urls
@@ -309,12 +314,13 @@ def filter_urls_by_paths(urls, ignore_paths=None, allow_paths=None):
     return filtered
 
 
-def fetch_post_titles(urls, remove_404_records=False):
+def fetch_post_titles(urls, remove_404_records=False, use_scrapfly=False):
     """Fetch titles for all URLs in parallel.
 
     Args:
         urls: Dictionary of URLs with their metadata
         remove_404_records: If True, exclude URLs that return 404
+        use_scrapfly: If True, fetch each URL via the Scrapfly proxy API
 
     Returns:
         List of post dictionaries
@@ -328,7 +334,7 @@ def fetch_post_titles(urls, remove_404_records=False):
 
     with ThreadPoolExecutor(max_workers=10) as executor:
         future_to_url = {
-            executor.submit(get_post_title, url, remove_404_records): url
+            executor.submit(get_post_title, url, remove_404_records, use_scrapfly): url
             for url in urls
         }
         for future in as_completed(future_to_url):
@@ -366,7 +372,7 @@ def fetch_post_titles(urls, remove_404_records=False):
 
 
 def crawl_sitemaps(
-    sitemap_urls, crawled=None
+    sitemap_urls, crawled=None, use_scrapfly=False
 ):
     crawled = crawled or set()
     retval = set()
@@ -374,12 +380,13 @@ def crawl_sitemaps(
         if sitemap in crawled:
             continue
         crawled.add(sitemap)
-        posts_or_sitemaps, is_sitemap_index = get_sitemap_urls(sitemap)
+        posts_or_sitemaps, is_sitemap_index = get_sitemap_urls(sitemap, use_scrapfly=use_scrapfly)
         if is_sitemap_index:
             retval.update(
                 crawl_sitemaps(
                     posts_or_sitemaps,
                     crawled=crawled,
+                    use_scrapfly=use_scrapfly,
                 )
             )
         else:
@@ -399,6 +406,8 @@ def sitemap2posts(
     remove_404_records=False,
     robots_allow_list=None,
     robots_sitemap_allow_list=None,
+    use_scrapfly=False,
+    **kwargs,
 ):
     """Main function to crawl sitemaps and extract post information."""
     if sitemap_allow_list is None:
@@ -424,11 +433,11 @@ def sitemap2posts(
             logging.info("Combining explicit sitemap URLs with robots.txt sitemaps")
         else:
             logging.info("Using sitemaps from robots.txt")
-        robots_sitemaps = get_sitemaps_from_robots(blog_url, sitemap_allow_list)
+        robots_sitemaps = get_sitemaps_from_robots(blog_url, sitemap_allow_list, use_scrapfly=use_scrapfly)
         sitemap_urls.extend(robots_sitemaps)
 
     all_sitemaps = list(
-        crawl_sitemaps(sitemap_urls)
+        crawl_sitemaps(sitemap_urls, use_scrapfly=use_scrapfly)
     )
     logging.info(f"Total sitemaps found after crawling: {len(all_sitemaps)}")
     filtered_sitemaps = []
@@ -449,7 +458,7 @@ def sitemap2posts(
         raise FetchSitemapError(exc_msg)
 
     # Collect URLs from all sitemaps
-    all_urls = collect_urls_from_sitemaps(filtered_sitemaps)
+    all_urls = collect_urls_from_sitemaps(filtered_sitemaps, use_scrapfly=use_scrapfly)
 
     # Deduplicate URLs
     deduped_urls = dedupe_urls(all_urls)
@@ -465,7 +474,7 @@ def sitemap2posts(
         return []
     
     # Fetch post titles (404 check is done during fetch if remove_404_records is True)
-    posts = fetch_post_titles(filtered_urls, remove_404_records)
+    posts = fetch_post_titles(filtered_urls, remove_404_records, use_scrapfly=use_scrapfly)
 
     if not posts:
         logging.warning("No posts to save after fetching titles.")
@@ -558,6 +567,12 @@ def parse_cli_arguments():
         action="store_true",
         help="Exclude URLs that return a 404 status code.",
     )
+    parser.add_argument(
+        "--use_scrapfly",
+        "--use-scrapfly",
+        action="store_true",
+        help="Fetch URLs via the Scrapfly proxy API instead of direct requests. Requires the SCRAPFLY_API_KEY environment variable.",
+    )
     args = parser.parse_args()
 
     if not args.use_robots_txt and not args.sitemap_urls:
@@ -580,6 +595,7 @@ if __name__ == "__main__":
         path_allow_list=args.path_allow_list,
         ignore_sitemaps=args.ignore_sitemaps,
         remove_404_records=args.remove_404_records,
+        use_scrapfly=args.use_scrapfly,
     )
 
     save_to_json(posts, args.output)

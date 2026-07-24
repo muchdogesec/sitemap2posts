@@ -29,6 +29,9 @@ sitemap2posts is designed to identify all posts for a blog, using sitemaps. It c
   - Path-based filtering with glob pattern support (`--path_ignore_list`, `--path_allow_list`)
   - Sitemap exclusion (`--ignore_sitemaps`)
   - Automatic 404 detection and removal (`--remove_404_records`)
+- **Scrapfly proxy support:**
+  - Route all fetches (robots.txt, sitemaps, and posts) through the [Scrapfly](https://scrapfly.io/) proxy API with `--use_scrapfly`
+  - Useful for blogs that block direct requests (e.g. 403/520 responses) or that hide their sitemap from non-browser clients
 - **Obstracts Integration:**
   - Direct synchronization to Obstracts feeds via API
   - Bulk post creation with job-based processing
@@ -57,6 +60,12 @@ pip3 install -r requirements.txt
 python sitemap2posts.py BLOG_URL
 ```
 
+To use `--use_scrapfly`, set the `SCRAPFLY_API_KEY` environment variable:
+
+```shell
+export SCRAPFLY_API_KEY="your-scrapfly-api-key"
+```
+
 ### Command-Line Options
 
 * **`blog_url`** (positional): Blog URL to extract posts from
@@ -69,6 +78,7 @@ python sitemap2posts.py BLOG_URL
 * **`--path_allow_list`**: Path patterns to allow. Supports glob patterns. Only URLs matching these patterns will be included. Examples: `/blog/post/*`, `*/2024/*`
 * **`--ignore_sitemaps`**: Comma-separated list of specific sitemap URLs to ignore
 * **`--remove_404_records`**: Exclude URLs that return a 404 status code (checked during title fetch to avoid duplicate requests)
+* **`--use_scrapfly`**: Fetch robots.txt, sitemaps, and posts via the [Scrapfly](https://scrapfly.io/) proxy API instead of direct requests. Requires the `SCRAPFLY_API_KEY` environment variable to be set
 
 ### Sitemap Source Selection
 

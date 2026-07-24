@@ -18,6 +18,7 @@
         "https://www.govinfosecurity.com/"
     ],
     "omit_author": true,
+    "use_scrapfly": true,
     "preferred_date": "H",
     "name": "GovInfoSecurity"
 }
