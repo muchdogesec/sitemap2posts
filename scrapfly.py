@@ -38,6 +38,7 @@ def fetch_with_scapfly(session, url, headers, use_scrapfly_asp=False):
         key=proxy_apikey,
         url=url,
         country="us,ca,mx,gb,fr,de,au,at,be,hr,cz,dk,ee,fi,ie,se,es,pt,nl",
+        retry=True
     )
     if use_scrapfly_asp:
         params["asp"] = "true"
