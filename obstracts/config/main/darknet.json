@@ -12,5 +12,6 @@
     ],
     "omit_author": true,
     "preferred_date": "P",
+    "use_scrapfly": true,
     "name": "Darknet"
 }

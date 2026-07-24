@@ -32,6 +32,7 @@ DEFAULT_PREFERRED_DATE = (
 )
 DEFAULT_OMIT_AUTHOR = False  # Default: include author information
 DEFAULT_USE_DATE_FILTER = True  # Default: filter posts by date
+DEFAULT_USE_SCRAPFLY = False  # Default: fetch URLs directly, not via Scrapfly
 
 
 class GitHubActionsOutput:
@@ -520,6 +521,7 @@ def process_feed(
         "sitemap_allow_list", feed_config.get("robots_allow_list")
     )
     use_robots_txt = feed_config.get("use_robots_txt")
+    use_scrapfly = feed_config.get("use_scrapfly", DEFAULT_USE_SCRAPFLY)
 
     feed_details = api_client.get_feed_details(feed_id)  # Ensure feed exists
     if not feed_details:
@@ -615,6 +617,7 @@ def process_feed(
         path_allow_list=feed_config.get("path_allow_list"),
         ignore_sitemaps=feed_config.get("ignore_sitemaps"),
         remove_404_records=feed_config.get("remove_404_records", False),
+        use_scrapfly=use_scrapfly,
     )
 
     if not posts:

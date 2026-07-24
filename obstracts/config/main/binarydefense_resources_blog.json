@@ -16,5 +16,6 @@
     ],
     "omit_author": true,
     "preferred_date": "H",
+    "use_scrapfly": true,
     "name": "Binary Defense"
 }

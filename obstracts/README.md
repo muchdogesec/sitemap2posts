@@ -24,6 +24,12 @@ export OBSTRACTS_API_BASE_URL="<OBSTRACTS WEB TOKEN>"
 export OBSTRACTS_API_KEY="<YOUR OBSTRACTS WEB TOKEN>"
 ```
 
+If any feed configuration sets `use_scrapfly` to `true`, also set:
+
+```bash
+export SCRAPFLY_API_KEY="<YOUR SCRAPFLY API KEY>"
+```
+
 ### Configuration Files
 
 Feed configurations are stored as individual JSON files organized by category:
@@ -98,6 +104,7 @@ Each feed configuration file supports the following options:
   - Examples: `["/blog/post/*", "*/2024/*"]`
 - **ignore_sitemaps** (optional): Array of specific sitemap URLs to skip
 - **remove_404_records** (optional, default: `false`): Whether to exclude URLs that return 404
+- **use_scrapfly** (optional, default: `false`): Whether to fetch robots.txt, sitemaps, and posts via the [Scrapfly](https://scrapfly.io/) proxy API instead of direct requests. Useful for blogs that block direct requests (e.g. 403/520 responses) or hide their sitemap from non-browser clients. Requires the `SCRAPFLY_API_KEY` environment variable to be set
 
 ## Usage
 
